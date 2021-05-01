@@ -1,5 +1,31 @@
 ﻿@page "/"
+@inject HttpClient Http
 
 <h1>Hello, world!</h1>
 
 Yeah, it's that crappy .Net off the shelf starter app!
+
+<div class="dev">
+	<pre>
+	    @_rs
+	</pre>
+</div>
+
+@code {
+
+    private string _rs = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+      try
+      {
+            _rs = "Loading...";
+            _rs = await Http.GetStringAsync("/.auth/me");
+      }
+      catch (Exception ex)
+      {
+            _rs = ex.Message;
+            Console.WriteLine(ex.ToString());
+      }
+    }
+}

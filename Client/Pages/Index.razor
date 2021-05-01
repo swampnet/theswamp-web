@@ -7,25 +7,36 @@ Yeah, it's that crappy .Net off the shelf starter app!
 
 <div class="dev">
 	<pre>
-	    @_rs
+	    @_rs1
+	    @_rs2
 	</pre>
 </div>
 
 @code {
 
-    private string _rs = null;
+    private string _rs1 = null;
+    private string _rs2 = null;
 
     protected override async Task OnInitializedAsync()
     {
       try
       {
-            _rs = "Loading...";
-            _rs = await Http.GetStringAsync("/.auth/me");
+            _rs1 = "Loading...";
+            _rs1 = await Http.GetStringAsync("/.auth/me");
       }
       catch (Exception ex)
       {
-            _rs = ex.Message;
-            Console.WriteLine(ex.ToString());
+            _rs1 = ex.Message;
+      }
+
+      try
+      {
+            _rs2 = "Loading...";
+            _rs2 = await Http.GetStringAsync("/api/Auth");
+      }
+      catch (Exception ex)
+      {
+            _rs2 = ex.Message;
       }
     }
 }

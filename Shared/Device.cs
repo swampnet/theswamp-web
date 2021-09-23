@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace TheSwamp.Shared
 {
@@ -12,7 +13,13 @@ namespace TheSwamp.Shared
 
     public class DeviceValue
     {
+        [JsonProperty("d")]
+        public int DeviceId { get; set; }
+        
+        [JsonProperty("t")]
         public DateTime TimestampUtc { get; set; }
+        
+        [JsonProperty("v")]
         public string Value { get; set; }
     }
 }

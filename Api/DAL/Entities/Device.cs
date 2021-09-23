@@ -12,7 +12,6 @@ namespace TheSwamp.Api.DAL.Entities
     public class DeviceValue : Shared.DeviceValue
     {
         public long Id { get; set; }
-        public int DeviceId { get; set; }
         public Device Device { get; set; }
     }
 }

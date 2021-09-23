@@ -6,31 +6,44 @@
 
 <p>Demonstrates fetching data from the server.</p>
 
-@if (rs == null)
+@if (values == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <div>
-        @rs
-    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>TimestampUtc</th>
+                <th>Value</th>
+            </tr>
+        </thead>
 
+        <tbody>
+            @foreach(var val in values)
+            {
+                <tr>
+                    <td>@val.TimestampUtc</td>
+                    <td>@val.Value</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
 
 @code {
-    private string rs;
+    private DeviceValue[] values;
+    private int device = 1;
 
     protected override async Task OnInitializedAsync()
     {
       try
       {
-            rs = await Http.GetStringAsync("/api/ping");
-            //rs = await Http.GetFromJsonAsync("/api/ping");
+            values = await Http.GetFromJsonAsync<DeviceValue[]>($"/api/monitor/{device}");
       }
       catch (Exception ex)
       {
-            rs = ex.Message;
             Console.WriteLine(ex.ToString());
       }
     }

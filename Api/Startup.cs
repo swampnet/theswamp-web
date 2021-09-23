@@ -1,9 +1,11 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TheSwamp.Api.DAL;
 using TheSwamp.Api.Interfaces;
 using TheSwamp.Api.Services;
 
@@ -24,7 +26,13 @@ namespace TheSwamp.Api
             builder.Services.AddSingleton<IConfiguration>(cfg);
             builder.Services.AddHttpClient();
 
-            builder.Services.AddSingleton<IMyService, MyService>();
+            builder.Services.AddTransient<IMyService, MyService>();
+            builder.Services.AddTransient<IMonitor, MonitorService>();
+            builder.Services.AddTransient<IAuth, Auth>();
+
+            builder.Services.AddDbContext<TrackingContext>(options =>
+                options.UseSqlServer(cfg["connectionstring.swampnet"])
+            );
         }
     }
 }

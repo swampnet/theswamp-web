@@ -19,16 +19,16 @@ Yeah, it's that crappy .Net off the shelf starter app!
 	<pre>
 	    @_rs1
 	</pre>
-      <div>/api/auth</div>
+@*      <div>/api/auth</div>
       <pre>
 	    @_rs2
       </pre>
-</div>
+*@</div>
 
 @code {
 
     private string _rs1 = null;
-    private string _rs2 = null;
+    //private string _rs2 = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -42,14 +42,14 @@ Yeah, it's that crappy .Net off the shelf starter app!
             _rs1 = ex.Message;
       }
 
-      try
-      {
-            _rs2 = "Loading...";
-            _rs2 = await Http.GetStringAsync("/api/auth");
-      }
-      catch (Exception ex)
-      {
-            _rs2 = ex.Message;
-      }
+      //try
+      //{
+      //      _rs2 = "Loading...";
+      //      _rs2 = await Http.GetStringAsync("/api/auth");
+      //}
+      //catch (Exception ex)
+      //{
+      //      _rs2 = ex.Message;
+      //}
     }
 }

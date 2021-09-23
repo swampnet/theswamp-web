@@ -7,12 +7,12 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
-using BlazorApp.Shared;
 using System.Text;
 using System.Linq;
 using System.Text.Json;
+using TheSwamp.Shared;
 
-namespace BlazorApp.Api
+namespace TheSwamp.Api
 {
     public static class Auth
     {

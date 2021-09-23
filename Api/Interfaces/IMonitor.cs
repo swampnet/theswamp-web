@@ -10,5 +10,7 @@ namespace TheSwamp.Api.Interfaces
     {
         public Task<Device[]> GetDevicesAsync();
         Task<DeviceValue[]> GetValuesAsync(int deviceId);
+        Task<Device> GetDeviceAsync(string deviceName);
+        Task PostValuesAsync(DeviceValue[] deviceValues);
     }
 }

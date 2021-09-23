@@ -10,6 +10,7 @@ Yeah, it's that crappy .Net off the shelf starter app!
 <ul>
     <li>upgrade-net5 branch</li>
     <li>changed & pushed</li>
+    <li>Rebooted repository -> latest template (net5.0 client)</li>
 </ul>
 
 
@@ -18,7 +19,7 @@ Yeah, it's that crappy .Net off the shelf starter app!
 	<pre>
 	    @_rs1
 	</pre>
-      <div>/api/Auth</div>
+      <div>/api/auth</div>
       <pre>
 	    @_rs2
       </pre>
@@ -44,7 +45,7 @@ Yeah, it's that crappy .Net off the shelf starter app!
       try
       {
             _rs2 = "Loading...";
-            _rs2 = await Http.GetStringAsync("/api/Auth");
+            _rs2 = await Http.GetStringAsync("/api/auth");
       }
       catch (Exception ex)
       {

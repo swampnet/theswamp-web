@@ -18,15 +18,28 @@ namespace Integration
                 //.AddCommandLine(args)
                 .Build();
 
-            AnsiConsole.WriteLine("Press key to get device info!");
-            Console.ReadKey();
-
-            AnsiConsole.WriteLine("getting device info");
             API.Initialise(_cfg["api:endpoint"], _cfg["api:key"]);
 
-            var x = await API.GetDeviceAsync("test-01");
-            AnsiConsole.WriteLine(x.ToString());
-            Console.ReadKey();
+            while (true)
+            {
+                var cmd = AnsiConsole.Prompt(
+                        new SelectionPrompt<string>()
+                            .Title("Select [green]option[/]?")
+                            .MoreChoicesText("[grey](Move up and down)[/]")
+                            .AddChoices(new[] { 
+                                "Get details", 
+                                "two", 
+                                "three" }));
+
+                switch (cmd)
+                {
+                    case "Get details":
+                        AnsiConsole.WriteLine("getting device info");
+                        var x = await API.GetDeviceAsync("test-01");
+                        AnsiConsole.WriteLine(x.ToString());
+                        break;
+                }
+            }
         }
     }
 }

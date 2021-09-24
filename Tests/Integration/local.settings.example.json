@@ -1,0 +1,6 @@
+{
+  "api": {
+    "endpoint": "http://localhost:7071",
+    "key": "<api-key>"
+  }
+}

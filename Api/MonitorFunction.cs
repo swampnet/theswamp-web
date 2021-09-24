@@ -30,7 +30,7 @@ namespace TheSwamp.Api
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "monitor")] HttpRequest req,
             ILogger log)
         {
-            if (!_auth.Authenticate(req))
+            if (!await _auth.AuthenticateAsync(req))
             {
                 return new UnauthorizedResult();
             }
@@ -56,12 +56,12 @@ namespace TheSwamp.Api
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "monitor")] HttpRequest req,
             ILogger log)
         {
-            if (!_auth.Authenticate(req))
+            if (!await _auth.AuthenticateAsync(req))
             {
                 return new UnauthorizedResult();
             }
 
-            using(var reader = new StreamReader(req.Body))
+            using (var reader = new StreamReader(req.Body))
             {
                 var json = await reader.ReadToEndAsync();
                 
@@ -73,12 +73,12 @@ namespace TheSwamp.Api
 
 
         [FunctionName("monitor-post")]
-        public IActionResult Post(
+        public async Task<IActionResult> Post(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "monitor/{id}")] HttpRequest req,
             int id,
             ILogger log)
         {
-            if (!_auth.Authenticate(req))
+            if (!await _auth.AuthenticateAsync(req))
             {
                 return new UnauthorizedResult();
             }

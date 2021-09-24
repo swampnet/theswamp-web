@@ -24,6 +24,8 @@ namespace TheSwamp.Api
                 .Build();
 
             builder.Services.AddSingleton<IConfiguration>(cfg);
+            builder.Services.AddSingleton<ICache, Cache>();
+
             builder.Services.AddHttpClient();
 
             builder.Services.AddTransient<IMyService, MyService>();
@@ -31,6 +33,9 @@ namespace TheSwamp.Api
             builder.Services.AddTransient<IAuth, Auth>();
 
             builder.Services.AddDbContext<TrackingContext>(options =>
+                options.UseSqlServer(cfg["connectionstring.swampnet"])
+            );
+            builder.Services.AddDbContext<ApiContext>(options =>
                 options.UseSqlServer(cfg["connectionstring.swampnet"])
             );
         }

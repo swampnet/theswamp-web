@@ -1,4 +1,5 @@
 @page "/fetchdata"
+@page "/fetchdata/{Device:int}"
 @using TheSwamp.Shared
 @inject HttpClient Http
 
@@ -33,14 +34,21 @@ else
 }
 
 @code {
+    [Parameter]
+    public int Device { get; set; }
+
     private DeviceValue[] values;
-    private int device = 1;
 
     protected override async Task OnInitializedAsync()
     {
+        await Task.CompletedTask;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
       try
       {
-            values = await Http.GetFromJsonAsync<DeviceValue[]>($"/api/monitor/{device}");
+            values = await Http.GetFromJsonAsync<DeviceValue[]>($"/api/monitor/{Device}");
       }
       catch (Exception ex)
       {

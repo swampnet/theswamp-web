@@ -2,11 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace TheSwamp.Api.Interfaces
 {
     public interface IAuth
     {
-        bool Authenticate(HttpRequest req);
+        Task<bool> AuthenticateAsync(HttpRequest req);
     }
 }

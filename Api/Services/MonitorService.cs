@@ -19,11 +19,27 @@ namespace TheSwamp.Api.Services
             _trackingContext = trackingContext;
         }
 
-        public async Task<Device[]> GetDevicesAsync()
+        public Task<DataSourceSummary[]> GetDataSourceSummaryAsync()
         {
-            var x = await _trackingContext.Devices.ToArrayAsync();
+            var query = _trackingContext.DataSources
+                .Select(x => new DataSourceSummary()
+                {
+                    Id = x.Id,
+                    Description = x.Description,
+                    Name = x.Name,
+                    LastUpdateOnUtc = x.Values.OrderByDescending(v => v.TimestampUtc).FirstOrDefault().TimestampUtc,
+                    LastValue = x.Values.OrderByDescending(v => v.TimestampUtc).FirstOrDefault().Value,                    UpdateCount = x.Values.Count()
+                });
 
-            return x.Select(y => new Device() { 
+            return query.ToArrayAsync();
+        }
+
+
+        public async Task<DataSource[]> GetDevicesAsync()
+        {
+            var x = await _trackingContext.DataSources.ToArrayAsync();
+
+            return x.Select(y => new DataSource() { 
                 Id = y.Id,
                 Name = y.Name,
                 Description = y.Description,
@@ -32,24 +48,24 @@ namespace TheSwamp.Api.Services
         }
 
 
-        public async Task<Device> GetDeviceAsync(string deviceName)
+        public async Task<DataSource> GetDeviceAsync(string deviceName)
         {
-            var x = await _trackingContext.Devices.Where(x => x.Name == deviceName).SingleOrDefaultAsync();
+            var x = await _trackingContext.DataSources.Where(x => x.Name == deviceName).SingleOrDefaultAsync();
 
             if(x == null)
             {
                 // create device
-                x = new DAL.Entities.Device()
+                x = new DAL.Entities.DataSource()
                 {
                     Name = deviceName,
                     CreatedOnUtc = DateTime.UtcNow
                 };
-                _trackingContext.Devices.Add(x);
+                _trackingContext.DataSources.Add(x);
 
                 await _trackingContext.SaveChangesAsync();
             }
 
-            return new Device()
+            return new DataSource()
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -58,13 +74,13 @@ namespace TheSwamp.Api.Services
             };
         }
 
-        public async Task<DeviceValue[]> GetValuesAsync (int deviceId)
+        public async Task<DataPoint[]> GetValuesAsync (int deviceId)
         {
-            var x = await _trackingContext.DeviceValues
-                .Where(dv => dv.DeviceId == deviceId)
+            var x = await _trackingContext.DataPoints
+                .Where(dv => dv.DataSourceId == deviceId)
                 .ToArrayAsync();
 
-            return x.Select(y => new DeviceValue()
+            return x.Select(y => new DataPoint()
             {
                 TimestampUtc = y.TimestampUtc,
                 Value = y.Value
@@ -72,16 +88,16 @@ namespace TheSwamp.Api.Services
         }
 
 
-        public async Task PostValuesAsync(DeviceValue[] deviceValues)
+        public async Task PostValuesAsync(DataPoint[] deviceValues)
         {
-            foreach(var grpd in deviceValues.GroupBy(d => d.DeviceId))
+            foreach(var grpd in deviceValues.GroupBy(d => d.DataSourceId))
             {
-                var device = await _trackingContext.Devices.SingleOrDefaultAsync(d => d.Id == grpd.Key);
+                var device = await _trackingContext.DataSources.SingleOrDefaultAsync(d => d.Id == grpd.Key);
                 if(device != null)
                 {
                     device.Values = grpd
                         .Select(d => 
-                            new DAL.Entities.DeviceValue() { 
+                            new DAL.Entities.DataPoint() { 
                                 TimestampUtc = d.TimestampUtc,
                                 Value = d.Value
                             })

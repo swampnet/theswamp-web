@@ -30,16 +30,16 @@ namespace TheSwamp.Shared
         }
 
 
-        public static async Task<Device> GetDeviceAsync(string name)
+        public static async Task<DataSource> GetDeviceAsync(string name)
         {
-            string url = $"{_endpoint}/api/monitor?deviceName={name}";
+            string url = $"{_endpoint}/api/monitor?dataSource={name}";
             using (var rs = await Client.GetAsync(url))
             {
                 rs.EnsureSuccessStatusCode();
 
                 var json = await rs.Content.ReadAsStringAsync();
 
-                return JsonConvert.DeserializeObject<Device>(json);
+                return JsonConvert.DeserializeObject<DataSource>(json);
             }
         }
     }

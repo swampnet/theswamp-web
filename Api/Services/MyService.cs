@@ -21,7 +21,7 @@ namespace TheSwamp.Api.Services
         {
             _count++;
 
-            var x = _deviceContext.Devices.ToArray();
+            var x = _deviceContext.DataSources.ToArray();
 
             return $"bosh#{_count} @ {DateTime.Now}!";
         }

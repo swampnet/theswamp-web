@@ -4,7 +4,18 @@ using System.Text.Json.Serialization;
 
 namespace TheSwamp.Shared
 {
-    public class Device
+    public class DataSourceSummary
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public DateTime? LastUpdateOnUtc { get; set; }
+        public string LastValue { get; set; }
+        public int UpdateCount { get; set; }
+    }
+
+
+    public class DataSource
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -18,13 +29,13 @@ namespace TheSwamp.Shared
     }
 
 
-    public class DeviceValue
+    public class DataPoint
     {
         // well this is dumb. azure functions uses JSON.Net, Blazor uses System.Text.Json
         // i might just drop the attributes and rename the members directly
-        [JsonPropertyName("d")]
-        [JsonProperty("d")]
-        public int DeviceId { get; set; }
+        [JsonPropertyName("s")]
+        [JsonProperty("s")]
+        public int DataSourceId { get; set; }
 
         [JsonPropertyName("t")]
         [JsonProperty("t")]

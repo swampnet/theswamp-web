@@ -9,8 +9,8 @@ namespace TheSwamp.Api.DAL
 {
     public class TrackingContext : DbContext
     {
-        public DbSet<Device> Devices { get; set; }
-        public DbSet<DeviceValue> DeviceValues { get; set; }
+        public DbSet<DataSource> DataSources { get; set; }
+        public DbSet<DataPoint> DataPoints { get; set; }
 
         public TrackingContext(DbContextOptions<TrackingContext> options)
             : base(options)
@@ -21,8 +21,8 @@ namespace TheSwamp.Api.DAL
         {
             modelBuilder.HasDefaultSchema("trk");
 
-            modelBuilder.Entity<Device>().ToTable("Device");
-            modelBuilder.Entity<DeviceValue>().ToTable("DeviceValue");
+            modelBuilder.Entity<DataSource>().ToTable("DataSource");
+            modelBuilder.Entity<DataPoint>().ToTable("DataPoint");
             base.OnModelCreating(modelBuilder);
         }
     }

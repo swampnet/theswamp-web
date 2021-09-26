@@ -8,9 +8,10 @@ namespace TheSwamp.Api.Interfaces
 {
     public interface IMonitor
     {
-        public Task<Device[]> GetDevicesAsync();
-        Task<DeviceValue[]> GetValuesAsync(int deviceId);
-        Task<Device> GetDeviceAsync(string deviceName);
-        Task PostValuesAsync(DeviceValue[] deviceValues);
+        public Task<DataSourceSummary[]> GetDataSourceSummaryAsync();
+        public Task<DataSource[]> GetDevicesAsync();
+        Task<DataPoint[]> GetValuesAsync(int deviceId);
+        Task<DataSource> GetDeviceAsync(string deviceName);
+        Task PostValuesAsync(DataPoint[] deviceValues);
     }
 }

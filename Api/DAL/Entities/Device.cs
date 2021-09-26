@@ -4,14 +4,14 @@ using System.Text;
 
 namespace TheSwamp.Api.DAL.Entities
 {
-    public class Device : Shared.Device
+    public class DataSource : Shared.DataSource
     {
-        public ICollection<DeviceValue> Values { get; set; }
+        public ICollection<DataPoint> Values { get; set; }
     }
 
-    public class DeviceValue : Shared.DeviceValue
+    public class DataPoint : Shared.DataPoint
     {
         public long Id { get; set; }
-        public Device Device { get; set; }
+        public DataSource Source { get; set; }
     }
 }

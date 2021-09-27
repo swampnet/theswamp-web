@@ -1,6 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace TheSwamp.Shared
@@ -40,6 +43,20 @@ namespace TheSwamp.Shared
                 var json = await rs.Content.ReadAsStringAsync();
 
                 return JsonConvert.DeserializeObject<DataSource>(json);
+            }
+        }
+
+        public static async Task PostDataAsync(List<DataPoint> data)
+        {
+            if (data.Any())
+            {
+                string url = $"{_endpoint}/api/monitor";
+
+                using (var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json"))
+                {
+                    var rs = await Client.PostAsync(url, content);
+                    rs.EnsureSuccessStatusCode();
+                }
             }
         }
     }

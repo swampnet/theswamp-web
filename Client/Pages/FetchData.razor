@@ -12,26 +12,18 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Last Update</th>
-                <th>Last Value</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @foreach(var val in values)
-            {
-                <tr>
-                    <td>@val.Name</td>
-                    <td>@val.LastUpdateOnUtc</td>
-                    <td>@val.LastValue</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <MudTable Items="@values" Dense="true">
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>Last Update</MudTh>
+            <MudTh>Last Value</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.LastUpdateOnUtc</MudTd>
+            <MudTd>@context.LastValue</MudTd>
+        </RowTemplate>
+    </MudTable>
 }
 
 @code {

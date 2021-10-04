@@ -45,6 +45,8 @@ namespace TheSwamp.Api
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "monitor/summary")] HttpRequest req,
             ILogger log)
         {
+            log.LogDebug("monitor-list");
+
             var x = await _monitor.GetDataSourceSummaryAsync();
 
             return new OkObjectResult(x);

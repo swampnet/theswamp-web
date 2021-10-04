@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Spectre.Console;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using TheSwamp.Shared;
@@ -22,7 +23,6 @@ namespace Integration
 
             API.Initialise(_cfg["api:endpoint"], _cfg["api:key"]);
 
-            var timer = new Timer(AddData, null, 0, 1000);
 
             while (true)
             {
@@ -33,10 +33,15 @@ namespace Integration
                             .AddChoices(new[] { 
                                 "Get details", 
                                 "Flush", 
-                                "three" }));
+                                "Start" }));
 
                 switch (cmd)
                 {
+                    case "Start":
+                        var timer = new Timer(AddData, null, 0, 1000);
+                        AnsiConsole.WriteLine("start");
+                        break;
+
                     case "Get details":
                         AnsiConsole.WriteLine("getting device info");
                         var x = await API.GetDeviceAsync("test-01");
@@ -57,7 +62,10 @@ namespace Integration
 
         private static async void AddData(object state)
         {
-            await _data.AddDataPointAsync("test-01", _rng.Next(1, 3).ToString());
+            var n = _rng.Next(1, 10);
+            Debug.WriteLine($"RNG rolled {n}");
+            await _data.AddDataPointAsync("test-01", n);
+            await _data.AddDataPointAsync("test-02", n);
         }
     }
 }

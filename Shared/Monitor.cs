@@ -13,9 +13,9 @@ namespace TheSwamp.Shared
         private readonly Timer _timer;
         private readonly Dictionary<string, DataSourcePointsCache> _dataSource = new Dictionary<string, DataSourcePointsCache>();
 
-        public Monitor(int period = 60 * 1000)
+        public Monitor(int flushPeriod = 60 * 1000)
         {
-            _timer = new Timer(Flush, null, 10000, period);
+            _timer = new Timer(Flush, null, 10000, flushPeriod);
         }
 
 
@@ -38,7 +38,8 @@ namespace TheSwamp.Shared
                 var ds = _dataSource[dataSourceName];
                 var newValue = value?.ToString();
 
-                if (ds.LatestValue != newValue)
+                // If we're averaging, log everything - we take an average when we post it
+                if (ds.DataSource.UseAverage)
                 {
                     ds.Values.Add(new DataPoint()
                     {
@@ -46,8 +47,22 @@ namespace TheSwamp.Shared
                         TimestampUtc = DateTime.UtcNow,
                         Value = newValue
                     });
+                }
 
-                    ds.LatestValue = newValue;
+                // Not averaging, just log changes
+                else
+                {
+                    if (ds.LatestValue != newValue)
+                    {
+                        ds.Values.Add(new DataPoint()
+                        {
+                            DataSourceId = ds.DataSource.Id,
+                            TimestampUtc = DateTime.UtcNow,
+                            Value = newValue
+                        });
+
+                        ds.LatestValue = newValue;
+                    }
                 }
             }
         }
@@ -57,19 +72,49 @@ namespace TheSwamp.Shared
         {
             var data = new List<DataPoint>();
 
-            lock (_dataSource)
+            foreach (var xx in _dataSource.Keys)
             {
-                foreach (var xx in _dataSource.Values)
+                lock (xx)
                 {
-                    data.AddRange(xx.Values);
-                    xx.Values.Clear();
-                }
+                    var c = _dataSource[xx];
+                    if (c.Values.Any())
+                    {
+                        if (c.DataSource.UseAverage)
+                        {
+                            var avg = c.Values.Where(v => double.TryParse(v.Value, out double d)).Average(v => double.Parse(v.Value));
+                            if (c.DataSource.AveragePrecision.HasValue)
+                            {
+                                avg = Math.Round(avg, c.DataSource.AveragePrecision.Value);
+                            }
 
+                            var savg = avg.ToString();
+
+                            Console.WriteLine($"Averaging {c.Values.Count()} values ({savg})");
+
+                            if(savg != c.LastValue)
+                            {
+                                data.Add(new DataPoint()
+                                {
+                                    DataSourceId = c.DataSource.Id,
+                                    TimestampUtc = DateTime.UtcNow,
+                                    Value = savg
+                                });
+
+                                c.LastValue= savg;
+                            }
+                        }
+                        else
+                        {
+                            data.AddRange(c.Values);
+                        }
+                        c.Values.Clear();
+                    }
+                }
             }
 
             await API.PostDataAsync(data);
 
-            Debug.WriteLine($"flushed {data.Count()} items");
+            Console.WriteLine($"flushed {data.Count()} items");
         }
 
 
@@ -95,9 +140,14 @@ namespace TheSwamp.Shared
                 LatestValue = null;
             }
 
-            public string LatestValue { get; set; }
             public DataSource DataSource { get; private set; }
             public List<DataPoint> Values { get; private set; }
+            
+            // LAst average value we posted
+            public string LastValue { get; internal set; }
+
+            // LAst value logged
+            public string LatestValue { get; set; }
         }
     }
 }

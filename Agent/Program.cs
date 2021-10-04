@@ -12,14 +12,19 @@ namespace Agent
         static async Task Main(string[] args)
         {
             var lastRun = new Dictionary<IThing, DateTime>();
-            var cfg = new ConfigurationBuilder()
-               .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-               .AddJsonFile("settings.json", optional: true, reloadOnChange: true)
-               //.AddCommandLine(args)
-               .Build();
+
+            var builder = new ConfigurationBuilder();               
+
+#if DEBUG
+            builder.AddJsonFile("local.settings.json", optional: false, reloadOnChange: true);
+#else
+            builder.AddJsonFile("settings.json", optional: false, reloadOnChange: true);
+#endif
+
+            var cfg = builder.Build();
 
             API.Initialise(cfg["api:endpoint"], cfg["api:key"]);
-            var monitor = new Monitor();
+            var monitor = new Monitor(60000 * 5);
             var things = new List<IThing>();
 
             //things.Add(new RandomNumberThing());
@@ -34,23 +39,25 @@ namespace Agent
                     {
                         if (!lastRun.ContainsKey(t))
                         {
+                            Console.WriteLine($"Add {t.GetType().Name}");
                             lastRun.Add(t, DateTime.MinValue);
                         }
 
-                        if (lastRun[t] < DateTime.UtcNow.Subtract(t.PollInterval))
+                        var diff = (DateTime.UtcNow - lastRun[t]).TotalSeconds;
+                        if (diff > t.PollInterval.TotalSeconds)
                         {
-                            Console.WriteLine($"[{DateTime.UtcNow}] Poll {t.GetType().Name}");
+                            Console.WriteLine($"[{DateTime.UtcNow}] Poll {t.GetType().Name} ({diff})");
                             await t.PollAsync(monitor);
                             lastRun[t] = DateTime.UtcNow;
                         }
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex);
+                        Console.WriteLine(ex);
                     }
                 }
 
-                await Task.Delay(100);
+                await Task.Delay(1000);
             }
         }
     }

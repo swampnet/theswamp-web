@@ -11,7 +11,7 @@ namespace Agent
     {
         private readonly SensorHub _sh;
 
-        public TimeSpan PollInterval => TimeSpan.FromSeconds(0.5);
+        public TimeSpan PollInterval => TimeSpan.FromSeconds(60);
 
         public SensorHubThing()
         {

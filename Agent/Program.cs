@@ -12,11 +12,16 @@ namespace Agent
         static async Task Main(string[] args)
         {
             var lastRun = new Dictionary<IThing, DateTime>();
-            var cfg = new ConfigurationBuilder()
-               .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-               .AddJsonFile("settings.json", optional: true, reloadOnChange: true)
-               //.AddCommandLine(args)
-               .Build();
+
+            var builder = new ConfigurationBuilder();               
+
+#if DEBUG
+            builder.AddJsonFile("local.settings.json", optional: false, reloadOnChange: true);
+#else
+            builder.AddJsonFile("settings.json", optional: false, reloadOnChange: true);
+#endif
+
+            var cfg = builder.Build();
 
             API.Initialise(cfg["api:endpoint"], cfg["api:key"]);
             var monitor = new Monitor(60000 * 5);

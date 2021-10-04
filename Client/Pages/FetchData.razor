@@ -6,54 +6,7 @@
 
 <p>Demonstrates fetching data from the server.</p>
 
-@if (values == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Last Update</th>
-                <th>Last Value</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @foreach(var val in values)
-            {
-                <tr>
-                    <td>@val.Name</td>
-                    <td>@val.LastUpdateOnUtc</td>
-                    <td>@val.LastValue</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<ValueSummaries />
 
 @code {
-    [Parameter]
-    public int Device { get; set; }
-
-    private DataSourceSummary[] values;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await Task.CompletedTask;
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-      try
-      {
-            values = await Http.GetFromJsonAsync<DataSourceSummary[]>($"/api/monitor/summary");
-      }
-      catch (Exception ex)
-      {
-            Console.WriteLine(ex.ToString());
-      }
-    }
 }

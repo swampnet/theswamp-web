@@ -1,0 +1,66 @@
+﻿@using System.Threading
+@using TheSwamp.Shared
+
+@implements IDisposable
+
+@inject HttpClient Http
+
+@if(_values == null)
+{
+    <div>Loading...</div>    
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th width="80%">Name</th>
+                <th width="20%">Value</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach(var val in _values.Where(v => v.LastUpdateOnUtc.HasValue))
+            {
+                <tr>
+                    <td>
+                        @val.Name
+                        <div style="font-size:x-small">@val.LastUpdateOnUtc.GetValueOrDefault().ToLocalTime().ToString("dd MMM yyyy hh\\:mm")</div>
+                    </td>
+                    <td>@val.LastValue</td>
+                </tr>
+            }
+        </tbody>
+    </table>    
+}
+
+    <div style="font-size:x-small">update: @DateTime.Now.ToLocalTime().ToLongTimeString()</div>
+
+@code {
+
+    private DataSourceSummary[] _values;
+    private Timer _timer;
+    
+    protected override void OnInitialized()
+    {
+        _timer = new Timer(new TimerCallback(async _ =>
+        {
+              try
+              {
+                _values = await Http.GetFromJsonAsync<DataSourceSummary[]>($"/api/monitor/summary");
+
+                this.StateHasChanged();
+              }
+              catch (Exception ex)
+              {
+                    Console.WriteLine(ex.ToString());
+              }        
+        }), null, 1000, 30000);
+    }
+
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+}

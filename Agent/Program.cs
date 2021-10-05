@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Azure.Messaging.ServiceBus;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,6 +31,8 @@ namespace Agent
             //things.Add(new RandomNumberThing());
             things.Add(new SensorHubThing());
 
+            var queueHandler = new AgentQueueHandler(cfg);
+            await queueHandler.StartAsync();
 
             while (true)
             {

@@ -1,0 +1,35 @@
+﻿@page "/post-message"
+@using TheSwamp.Shared
+@inject HttpClient Http
+
+<h1>Post Message</h1>
+
+<p>Enter some text below & hit 'Post' to have it display on my noddy LCD matrix</p>
+
+<div>
+    <input class="form-control" @bind="_message" />
+</div>
+
+<button class="btn btn-primary" @onclick="Post">Post</button>
+
+<div>
+    @_result
+</div>
+
+@code {
+    private string _message = "Hello, world!";
+    private string _result = "";
+
+    private async Task Post()
+    {
+        _result = "Sending...";
+
+        await Http.PostAsJsonAsync($"/api/agent-post-message", new AgentMessage()
+        {
+            Message = _message
+        }, null);
+
+        _result = _message + " - Sent!";
+        _message = "";
+    }
+}

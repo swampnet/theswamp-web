@@ -27,9 +27,11 @@ namespace TheSwamp.Api.Services
                 {
                     Id = x.Id,
                     Description = x.Description,
+                    Units = x.Units,
                     Name = x.Name,
                     LastUpdateOnUtc = x.Values.OrderByDescending(v => v.TimestampUtc).FirstOrDefault().TimestampUtc,
-                    LastValue = x.Values.OrderByDescending(v => v.TimestampUtc).FirstOrDefault().Value,                    UpdateCount = x.Values.Count()
+                    LastValue = x.Values.OrderByDescending(v => v.TimestampUtc).FirstOrDefault().Value,                    
+                    UpdateCount = x.Values.Count()
                 });
 
             return query.ToArrayAsync();

@@ -31,7 +31,7 @@ namespace Agent
 
         public Task ProcessAsync(AgentMessage msg)
         {
-            var content = msg.Properties.StringValue("content");
+            var content = msg.Properties.StringValue("content", "No content....");
             Console.WriteLine($"{this.GetType().Name} '{content}'");
             _devices.Rotation = RotationType.Left;
             var writer = new MatrixGraphics(_devices, Fonts.CP437);

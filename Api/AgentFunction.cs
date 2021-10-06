@@ -37,13 +37,13 @@ namespace TheSwamp.Api
                 var msg = JsonConvert.DeserializeObject<AgentMessage>(json);
 
                 await LogMessageAsync(req.GetClientIp(), msg);
-                
-                //await using(ServiceBusClient client = new ServiceBusClient(_cfg["azure.servicebus"]))
-                //{
-                //    var sender = client.CreateSender("iot_agent");
-                //    var message = new ServiceBusMessage(json);
-                //    await sender.SendMessageAsync(message);
-                //}
+
+                await using (ServiceBusClient client = new ServiceBusClient(_cfg["azure.servicebus"]))
+                {
+                    var sender = client.CreateSender("iot_agent");
+                    var message = new ServiceBusMessage(json);
+                    await sender.SendMessageAsync(message);
+                }
             }
 
             return new OkResult();

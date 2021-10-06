@@ -27,7 +27,13 @@ else
                         @val.Name
                         <div style="font-size:x-small">@val.LastUpdateOnUtc.GetValueOrDefault().ToLocalTime().ToString("dd MMM yyyy HH\\:mm")</div>
                     </td>
-                    <td>@val.LastValue</td>
+                    <td>
+                        <span>@val.LastValue</span>
+                        @if (!string.IsNullOrWhiteSpace(val.Units))
+                        {
+                            <sup style="font-weight:bold;margin-left:5px">@val.Units</sup>
+                        }
+                    </td>
                 </tr>
             }
         </tbody>

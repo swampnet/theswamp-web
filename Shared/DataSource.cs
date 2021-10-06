@@ -9,6 +9,7 @@ namespace TheSwamp.Shared
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public string Units { get; set; }
         public DateTime? LastUpdateOnUtc { get; set; }
         public string LastValue { get; set; }
         public int UpdateCount { get; set; }
@@ -23,6 +24,8 @@ namespace TheSwamp.Shared
         public DateTime CreatedOnUtc { get; set; }
         public bool UseAverage { get; set; }
         public int? AveragePrecision { get; set; }
+        public string Units { get; set; }
+
         public override string ToString()
         {
             return $"[{Id}] {Name}";

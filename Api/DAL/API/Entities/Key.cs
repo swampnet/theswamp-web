@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TheSwamp.Api.DAL.Entities
+namespace TheSwamp.Api.DAL.API.Entities
 {
     public class KeyEntity
     {

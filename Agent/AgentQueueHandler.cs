@@ -55,13 +55,14 @@ namespace Agent
         {
             string json = arg.Message.Body.ToString();
             var msg = JsonConvert.DeserializeObject<AgentMessage>(json);
-            Console.WriteLine($"Message Q:{arg.Message.MessageId} received: '{msg.Message}'");
+            Console.WriteLine($"Message Q:{arg.Message.MessageId} received");
             await arg.CompleteMessageAsync(arg.Message);
 
             MessageReceived?.Invoke(this, new MessageReceivedEventArgs(msg));
 
             try
             {
+                // @TODO: Find right handler(s) for msg.Type
                 await _handler.ProcessAsync(msg);
             }
             catch (Exception ex)

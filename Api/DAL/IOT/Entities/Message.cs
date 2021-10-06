@@ -15,7 +15,6 @@ namespace TheSwamp.Api.DAL.IOT.Entities
 
         public long Id { get; set; }
         public DateTime TimestampUtc { get; set; }
-        public string ClientIp { get; set; }
         public string Type { get; set; }
 
         public ICollection<MessageProperty> Properties { get; set; }

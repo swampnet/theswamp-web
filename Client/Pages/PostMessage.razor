@@ -6,23 +6,91 @@
 
 <p>Enter some text below & hit 'Post' to have it display on my noddy LCD matrix</p>
 
-<div>
-    <input class="form-control" @bind="_message" />
+<div class="input-group">
+    <input type="text" class="form-control" placeholder="Send a message!" @bind="_message"  @bind:event="oninput" />
+    <div class="input-group-append">
+        <button class="btn btn-primary" type="button" disabled="@(string.IsNullOrWhiteSpace(_message))" @onclick="Post">Post</button>
+    </div>
 </div>
 
-<button class="btn btn-primary" @onclick="Post">Post</button>
-
-<div>
+<div style="margin:10px;color:darkblue">
     @_result
 </div>
 
+<div style="margin:30px">
+    @if (_values == null)
+    {
+        <div>Loading recent messages...</div>
+    }
+    else
+    {
+        <h3>Recent messages</h3>
+        <table class="table table-sm" style="font-size:small">
+            <thead class="thead-dark">
+                <tr>
+                    <th width="15%">Time</th>
+                    <th width="15%">From</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var m in _values)
+                {
+                    <tr>
+                        <td>@m.TimestampUtc.ToLocalTime().ToString("dd MMM HH\\:mm")</td>
+                        <td>@m.Properties.StringValue("client-ip")</td>
+                        <td>@m.Properties.StringValue("content")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
 @code {
-    private string _message = "Hello, world!";
+    private AgentMessage[] _values;
+    private string _message = "Hello!!";
     private string _result = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshHistoryAsync();
+        //_timer = new Timer(new TimerCallback(async _ =>
+        //{
+        //    try
+        //    {
+        //        _values = await Http.GetFromJsonAsync<DataSourceSummary[]>($"/api/monitor/summary");
+
+        //        this.StateHasChanged();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex.ToString());
+        //    }
+        //}), null, 1000, 30000);
+    }
+
+
+    private async Task RefreshHistoryAsync()
+    {
+        try
+        {
+            _values = await Http.GetFromJsonAsync<AgentMessage[]>($"/api/agent/queue/led-matrix");
+
+            this.StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+    }
+
 
     private async Task Post()
     {
-        _result = "Sending...";
+        var x = _message;
+        _message = "";
+        _result = "Sending message: '" + x + "'";
 
         await Http.PostAsJsonAsync($"/api/agent/queue", new AgentMessage()
         {
@@ -32,12 +100,13 @@
                 new Property()
                 {
                     Name = "content",
-                    Value = _message
+                    Value = x
                 }
             }
         }, null);
 
-        _result = _message + " - Sent!";
-        _message = "";
+        _result = "Sent message '" + x + "'";
+
+        await RefreshHistoryAsync();
     }
 }

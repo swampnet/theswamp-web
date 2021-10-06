@@ -8,6 +8,7 @@ namespace TheSwamp.Shared
     {
         public AgentMessage()
         {
+            TimestampUtc = DateTime.UtcNow;
             Properties = new List<Property>();
         }
 
@@ -17,7 +18,7 @@ namespace TheSwamp.Shared
             Type = type;
         }
 
-
+        public DateTime TimestampUtc { get; set; }
         public string Type { get; set; }
         public List<Property> Properties { get; set; }
     }
@@ -25,6 +26,16 @@ namespace TheSwamp.Shared
 
     public class Property : IProperty
     {
+        public Property()
+        {
+        }
+
+        public Property(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
+
         public string Name { get; set; }
         public string Value { get; set; }
     }

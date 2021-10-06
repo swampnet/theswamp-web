@@ -6,6 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using TheSwamp.Api.DAL;
+using TheSwamp.Api.DAL.API;
+using TheSwamp.Api.DAL.IOT;
+using TheSwamp.Api.DAL.TRK;
 using TheSwamp.Api.Interfaces;
 using TheSwamp.Api.Services;
 
@@ -28,14 +31,18 @@ namespace TheSwamp.Api
 
             builder.Services.AddHttpClient();
 
-            builder.Services.AddTransient<IMyService, MyService>();
             builder.Services.AddTransient<IMonitor, MonitorService>();
             builder.Services.AddTransient<IAuth, Auth>();
 
             builder.Services.AddDbContext<TrackingContext>(options =>
                 options.UseSqlServer(cfg["connectionstring.swampnet"])
             );
+
             builder.Services.AddDbContext<ApiContext>(options =>
+                options.UseSqlServer(cfg["connectionstring.swampnet"])
+            );
+
+            builder.Services.AddDbContext<IotContext>(options =>
                 options.UseSqlServer(cfg["connectionstring.swampnet"])
             );
         }

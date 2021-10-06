@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TheSwamp.Api.DAL.Entities;
+using TheSwamp.Api.DAL.TRK.Entities;
 
-namespace TheSwamp.Api.DAL
+namespace TheSwamp.Api.DAL.TRK
 {
     public class TrackingContext : DbContext
     {

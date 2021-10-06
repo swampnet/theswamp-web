@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TheSwamp.Api.DAL.Entities
+namespace TheSwamp.Api.DAL.TRK.Entities
 {
     public class DataSource : Shared.DataSource
     {

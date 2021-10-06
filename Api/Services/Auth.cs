@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TheSwamp.Api.DAL;
+using TheSwamp.Api.DAL.API;
 using TheSwamp.Api.Interfaces;
 
 namespace TheSwamp.Api.Services

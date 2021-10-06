@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TheSwamp.Api.DAL.Entities;
+using TheSwamp.Api.DAL.API.Entities;
 
-namespace TheSwamp.Api.DAL
+namespace TheSwamp.Api.DAL.API
 {
     public class ApiContext : DbContext
     {

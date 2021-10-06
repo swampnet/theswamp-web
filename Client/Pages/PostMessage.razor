@@ -24,9 +24,17 @@
     {
         _result = "Sending...";
 
-        await Http.PostAsJsonAsync($"/api/agent-post-message", new AgentMessage()
+        await Http.PostAsJsonAsync($"/api/agent/queue", new AgentMessage()
         {
-            Message = _message
+            Type = "led-matrix",
+            Properties = new List<Property>()
+            {
+                new Property()
+                {
+                    Name = "content",
+                    Value = _message
+                }
+            }
         }, null);
 
         _result = _message + " - Sent!";

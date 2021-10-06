@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TheSwamp.Api.DAL;
+using TheSwamp.Api.DAL.TRK;
 using TheSwamp.Api.Interfaces;
 using TheSwamp.Shared;
 
@@ -55,7 +56,7 @@ namespace TheSwamp.Api.Services
             if(x == null)
             {
                 // create device
-                x = new DAL.Entities.DataSource()
+                x = new DAL.TRK.Entities.DataSource()
                 {
                     Name = deviceName,
                     CreatedOnUtc = DateTime.UtcNow,
@@ -100,7 +101,7 @@ namespace TheSwamp.Api.Services
                 {
                     device.Values = grpd
                         .Select(d => 
-                            new DAL.Entities.DataPoint() { 
+                            new DAL.TRK.Entities.DataPoint() { 
                                 TimestampUtc = d.TimestampUtc,
                                 Value = d.Value
                             })

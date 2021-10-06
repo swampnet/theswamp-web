@@ -31,13 +31,13 @@ namespace Agent
 
         public Task ProcessAsync(AgentMessage msg)
         {
-            Console.WriteLine($"{this.GetType().Name} '{msg.Message}'");
-
+            var content = msg.Properties.StringValue("content");
+            Console.WriteLine($"{this.GetType().Name} '{content}'");
             _devices.Rotation = RotationType.Left;
             var writer = new MatrixGraphics(_devices, Fonts.CP437);
 
             writer.Font = Fonts.CP437;
-            writer.ShowMessage(msg.Message, alwaysScroll: true);
+            writer.ShowMessage(content, alwaysScroll: true);
 
             return Task.CompletedTask;
         }

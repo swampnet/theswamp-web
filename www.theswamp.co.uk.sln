@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31717.71
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31105.61
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{B3A5AFFA-5517-41E6-BAE2-C30558032DD9}"
 EndProject
@@ -28,7 +28,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agent", "Agent\Agent.csproj
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "media", "media", "{A16582D6-6AC7-439A-AAF0-4924309CDC8F}"
 	ProjectSection(SolutionItems) = preProject
+		media\20210926_135807.jpg = media\20210926_135807.jpg
 		media\20210926_142045.jpg = media\20210926_142045.jpg
+		media\pi-01_bb.png = media\pi-01_bb.png
 	EndProjectSection
 EndProject
 Global

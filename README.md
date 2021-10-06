@@ -6,7 +6,7 @@ A [Blazor WebAssembly](https://docs.microsoft.com/aspnet/core/blazor/?view=aspne
 
 Here's what the backend looks like as of 01/Oct/2021, It's a Raspberry PI 4B, with a Sensor Hub HAT plugged into a breadboard.
 
-![01 OCT 2021](media/20210926_142045.jpg)
+![01 OCT 2021](media/20210926_135807.jpg)
 
 ### Sensor Hub 
 
@@ -21,3 +21,4 @@ The R-PI doesn't have any analogue pins, and a lot of what I have planned (vario
 
 
 
+![Breadboard diagram](media/pi-01_bb.png)

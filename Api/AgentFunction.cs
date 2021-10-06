@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using TheSwamp.Api.DAL.IOT;
 using TheSwamp.Api.DAL.IOT.Entities;
@@ -35,8 +37,8 @@ namespace TheSwamp.Api
             {
                 var json = await reader.ReadToEndAsync();
                 var msg = JsonConvert.DeserializeObject<AgentMessage>(json);
-
-                await LogMessageAsync(req.GetClientIp(), msg);
+                msg.Properties.Add(new Property("client-ip", req.GetClientIp()));
+                await LogMessageAsync(msg);
 
                 await using (ServiceBusClient client = new ServiceBusClient(_cfg["azure.servicebus"]))
                 {
@@ -50,13 +52,37 @@ namespace TheSwamp.Api
         }
 
 
+        [FunctionName("agent-recent-messages")]
+        public async Task<IActionResult> GetRecent(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "agent/queue/{type}")] HttpRequest req, 
+            string type)        
+        {
+            var messages = await _iotContext.Messages
+                .Include(f => f.Properties)
+                .Where(f => f.Type == type)
+                .OrderByDescending(f => f.TimestampUtc)
+                .Take(10)
+                .Select(m => new AgentMessage() { 
+                    Type = m.Type,
+                    TimestampUtc = m.TimestampUtc,
+                    Properties = m.Properties.Select(x => new Property()
+                    {
+                        Name = x.Name,
+                        Value = x.Value
+                    }).ToList()
+                })
+                .ToArrayAsync();
 
-        private async Task LogMessageAsync(string clientIp, AgentMessage msg)
+            return new OkObjectResult(messages);
+        }
+
+
+
+        private async Task LogMessageAsync(AgentMessage msg)
         {
             var m = new Message()
             {
-                Type = msg.Type,
-                ClientIp = clientIp
+                Type = msg.Type
             };
 
             if(msg.Properties != null)
@@ -73,7 +99,7 @@ namespace TheSwamp.Api
             await _iotContext.Messages.AddAsync(m);
             await _iotContext.SaveChangesAsync();
 
-            _log.LogInformation($"post from {clientIp}");
+            _log.LogInformation($"post from {msg.Properties.StringValue("ClientIp", "unknown")}");
         }
     }
 }

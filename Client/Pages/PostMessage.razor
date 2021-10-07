@@ -1,17 +1,24 @@
 ﻿@page "/post-message"
+@implements IDisposable
+
+
+@using System.Threading
 @using TheSwamp.Shared
+
 @inject HttpClient Http
 
 <h1>Post Message</h1>
 
 <p>Enter some text below & hit 'Post' to have it display on my noddy LCD matrix</p>
 
-<div class="input-group">
-    <input type="text" class="form-control" placeholder="Send a message!" @bind="_message"  @bind:event="oninput" />
-    <div class="input-group-append">
-        <button class="btn btn-primary" type="button" disabled="@(string.IsNullOrWhiteSpace(_message))" @onclick="Post">Post</button>
+<form @onsubmit="Post">
+    <div class="input-group">
+        <input type="text" class="form-control" placeholder="Send a message!" @bind="_message" @bind:event="oninput" />
+        <div class="input-group-append">
+            <button class="btn btn-primary" type="submit" disabled="@(string.IsNullOrWhiteSpace(_message))">Post</button>
+        </div>
     </div>
-</div>
+</form>
 
 <div style="margin:10px;color:darkblue">
     @_result
@@ -51,23 +58,15 @@
     private AgentMessage[] _values;
     private string _message = "Hello!!";
     private string _result = "";
+    private Timer _timer;
 
-    protected override async Task OnInitializedAsync()
+
+    protected override void OnInitialized()
     {
-        await RefreshHistoryAsync();
-        //_timer = new Timer(new TimerCallback(async _ =>
-        //{
-        //    try
-        //    {
-        //        _values = await Http.GetFromJsonAsync<DataSourceSummary[]>($"/api/monitor/summary");
-
-        //        this.StateHasChanged();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine(ex.ToString());
-        //    }
-        //}), null, 1000, 30000);
+        _timer = new Timer(new TimerCallback(async _ =>
+        {
+            await RefreshHistoryAsync();
+        }), null, 0, 30000);
     }
 
 
@@ -108,5 +107,11 @@
         _result = "Sent message '" + x + "'";
 
         await RefreshHistoryAsync();
+    }
+
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
     }
 }

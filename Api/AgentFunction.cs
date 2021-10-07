@@ -53,7 +53,7 @@ namespace TheSwamp.Api
 
 
         [FunctionName("agent-recent-messages")]
-        public async Task<IActionResult> GetRecent(
+        public async Task<ActionResult<AgentMessage[]>> GetRecent(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "agent/queue/{type}")] HttpRequest req, 
             string type)        
         {
@@ -73,7 +73,7 @@ namespace TheSwamp.Api
                 })
                 .ToArrayAsync();
 
-            return new OkObjectResult(messages);
+            return messages;
         }
 
 

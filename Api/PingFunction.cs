@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using TheSwamp.Api.Interfaces;
+using TheSwamp.Shared;
 
 namespace TheSwamp.Api
 {
@@ -24,24 +25,23 @@ namespace TheSwamp.Api
 
 
         [FunctionName("ping")]
-        public IActionResult Run(
+        public ActionResult<string> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
             var x = _myService.Boosh();
             log.LogInformation(x);
 
-            return new OkObjectResult(x);
+            return x;// new OkObjectResult(x);
         }
 
         [FunctionName("devices")]
-        public async Task<IActionResult> Devices(
+        public async Task<ActionResult<DataSource[]>> Devices(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
             var x = await _devices.GetDevicesAsync();
-
-            return new OkObjectResult(x);
+            return x;
         }
     }
 }

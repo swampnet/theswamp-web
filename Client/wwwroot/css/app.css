@@ -183,10 +183,6 @@ app {
     }
 }
 
-div.dev{
-    background-color: aliceblue;
-    padding: 5px;
-    margin: 5px;
-    margin-top: 20px;
+.dev{
     font-size: small;
 }

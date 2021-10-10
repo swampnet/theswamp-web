@@ -32,25 +32,15 @@
     else
     {
         <h3>Recent messages</h3>
-        <table class="table table-sm" style="font-size:small">
-            <thead class="thead-dark">
-                <tr>
-                    <th width="15%">Time</th>
-                    <th width="15%">From</th>
-                    <th>Message</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var m in _values)
-                {
-                    <tr>
-                        <td>@m.TimestampUtc.ToLocalTime().ToString("dd MMM HH\\:mm")</td>
-                        <td>@m.Properties.StringValue("client-ip")</td>
-                        <td>@m.Properties.StringValue("content")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+
+        <div class=led_messages>
+            @foreach(var m in _values)
+            {
+                <div class="led-message" style="transform: rotate(@CalculateTilt(m)deg)">
+                    @m.Properties.StringValue("content")                
+                </div>
+            }
+        </div>
     }
 </div>
 
@@ -112,6 +102,12 @@
         _result = "Sent message '" + x + "'";
 
         await RefreshHistoryAsync();
+    }
+
+
+    private int CalculateTilt(AgentMessage m)
+    {
+        return (m.TimestampUtc.Second % 40) - 20;
     }
 
 

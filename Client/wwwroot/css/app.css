@@ -187,6 +187,11 @@ app {
     font-size: small;
 }
 
+.led-background {
+/*    background-image: url("../img/20211011_091731_800.jpg");
+    background-position:right top;
+    background-repeat:no-repeat;
+*/}
 
 .led_messages {
     display: flex;

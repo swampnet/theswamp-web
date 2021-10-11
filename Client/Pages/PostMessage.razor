@@ -7,22 +7,27 @@
 
 @inject HttpClient Http
 
-<h1>Post Message</h1>
+<div class="led-background">
+    <h1>Post Message</h1>
 
-<p>Enter some text below & hit 'Post' to have it display on my noddy LCD matrix</p>
+    <p>Enter some text below & hit 'Post' to have it display on my noddy LCD matrix</p>
 
-<form @onsubmit="Post">
-    <div class="input-group">
-        <input type="text" class="form-control" placeholder="Send a message!" @bind="_message" @bind:event="oninput" />
-        <div class="input-group-append">
-            <button class="btn btn-primary" type="submit" disabled="@(string.IsNullOrWhiteSpace(_message))">Post</button>
+    <div>
+        <form @onsubmit="Post">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Send a message!" @bind="_message" @bind:event="oninput" />
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit" disabled="@(string.IsNullOrWhiteSpace(_message))">Post</button>
+                </div>
+            </div>
+        </form>
+
+        <div style="margin:10px;color:darkblue">
+            @_result
         </div>
     </div>
-</form>
-
-<div style="margin:10px;color:darkblue">
-    @_result
 </div>
+
 
 <div style="margin:30px">
     @if (_values == null)
@@ -32,28 +37,21 @@
     else
     {
         <h3>Recent messages</h3>
-        <table class="table table-sm" style="font-size:small">
-            <thead class="thead-dark">
-                <tr>
-                    <th width="15%">Time</th>
-                    <th width="15%">From</th>
-                    <th>Message</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var m in _values)
-                {
-                    <tr>
-                        <td>@m.TimestampUtc.ToLocalTime().ToString("dd MMM HH\\:mm")</td>
-                        <td>@m.Properties.StringValue("client-ip")</td>
-                        <td>@m.Properties.StringValue("content")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+
+        <div class=led_messages>
+            @foreach (var m in _values)
+            {
+                <div class="led-message" style="transform: rotate(@CalculateTilt(m)deg);background-color:@CalculateColor(m)">
+                    @m.Properties.StringValue("content")
+                </div>
+            }
+        </div>
     }
 </div>
 
+<div>
+    @_status
+</div>
 
 @code {
     private AgentMessage[] _values;
@@ -61,7 +59,28 @@
     private string _result = "";
     private Timer _timer;
     private string _status;
-
+    private string[] _messageColors = new[] {
+        "#f6f6a6",
+        "#f6f6b6",
+        "#f6f6c6",
+        "#f6f6d6",
+        "#f6f6e6",
+        "#f6f6f6",
+        "#f6a6f6",
+        "#f6b6f6",
+        "#f6c6f6",
+        "#fef6d6",
+        "#fdf6e6",
+        "#fcf6f6",
+        "#fba6f6",
+        "#fab6f6",
+        "#f6ffc6",
+        "#f6fed6",
+        "#f6fde6",
+        "#f6fcf6",
+        "#f6abf6",
+        "#f6baf6",
+    };
 
     protected override void OnInitialized()
     {
@@ -100,7 +119,7 @@
         {
             Type = "led-matrix",
             Properties = new List<Property>()
-        {
+    {
                 new Property()
                 {
                     Name = "content",
@@ -114,6 +133,17 @@
         await RefreshHistoryAsync();
     }
 
+
+    private int CalculateTilt(AgentMessage m)
+    {
+        return (m.TimestampUtc.Second % 40) - 20;
+    }
+
+    private string CalculateColor(AgentMessage m)
+    {
+        var i = (m.TimestampUtc.Second % _messageColors.Count());
+        return _messageColors[i];
+    }
 
     public void Dispose()
     {

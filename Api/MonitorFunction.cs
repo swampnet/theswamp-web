@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -65,7 +64,7 @@ namespace TheSwamp.Api
             using (var reader = new StreamReader(req.Body))
             {
                 var json = await reader.ReadToEndAsync();
-                
+
                 await _monitor.PostValuesAsync(JsonConvert.DeserializeObject<DataPoint[]>(json));
             }
 

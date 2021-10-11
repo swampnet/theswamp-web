@@ -1,20 +1,18 @@
-﻿using Azure.Messaging.ServiceBus;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using TheSwamp.Shared;
 
 namespace Agent
 {
-    internal class Program
+    internal static class Program
     {
         static async Task Main(string[] args)
         {
             var lastRun = new Dictionary<IThing, DateTime>();
 
-            var builder = new ConfigurationBuilder();               
+            var builder = new ConfigurationBuilder();
 
 #if DEBUG
             builder.AddJsonFile("local.settings.json", optional: false, reloadOnChange: true);
@@ -26,17 +24,19 @@ namespace Agent
 
             API.Initialise(cfg["api:endpoint"], cfg["api:key"]);
             var monitor = new Monitor(60000 * 5);
-            var things = new List<IThing>();
-
-            //things.Add(new RandomNumberThing());
-            things.Add(new SensorHubThing());
+            var things = new List<IThing>()
+            {
+                //new RandomNumberThing(),
+                new SensorHubThing(),
+                new Mcp3008Things()
+            };
 
             var queueHandler = new AgentQueueHandler(cfg);
             await queueHandler.StartAsync();
 
             while (true)
             {
-                foreach(var t in things)
+                foreach (var t in things)
                 {
                     try
                     {
@@ -49,7 +49,7 @@ namespace Agent
                         var diff = (DateTime.UtcNow - lastRun[t]).TotalSeconds;
                         if (diff > t.PollInterval.TotalSeconds)
                         {
-                            Console.WriteLine($"[{DateTime.UtcNow}] Poll {t.GetType().Name} ({diff})");
+                            //Console.WriteLine($"[{DateTime.UtcNow}] Poll {t.GetType().Name} ({diff})");
                             await t.PollAsync(monitor);
                             lastRun[t] = DateTime.UtcNow;
                         }
@@ -60,7 +60,7 @@ namespace Agent
                     }
                 }
 
-                await Task.Delay(1000);
+                await Task.Delay(500);
             }
         }
     }

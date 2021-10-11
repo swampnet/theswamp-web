@@ -2,10 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using TheSwamp.Api.DAL;
 using TheSwamp.Api.DAL.API;
 using TheSwamp.Api.DAL.IOT;
 using TheSwamp.Api.DAL.TRK;

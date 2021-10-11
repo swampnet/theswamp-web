@@ -1,10 +1,7 @@
 ﻿using Iot.Device.Max7219;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
 using System.Device.Spi;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using TheSwamp.Shared;
 
@@ -12,20 +9,25 @@ namespace Agent
 {
     internal class LedMatrixMessageHandler
     {
+        private const int _chipSelectLine = 0;
+        private const int _busId = 0;
+        private readonly SpiConnectionSettings _hardwareSpiSettings;
+        private readonly SpiDevice _spi;
+
+
         private readonly IConfiguration _cfg;
-        private readonly SpiDevice _spiDevice;
         private readonly Max7219 _devices;
 
         public LedMatrixMessageHandler(IConfiguration cfg)
         {
             _cfg = cfg;
-            var connectionSettings = new SpiConnectionSettings(0, 0)
+            _hardwareSpiSettings = new SpiConnectionSettings(_busId, _chipSelectLine)
             {
                 ClockFrequency = 10_000_000,
                 Mode = SpiMode.Mode0
             };
-            _spiDevice = SpiDevice.Create(connectionSettings);
-            _devices = new Max7219(_spiDevice, cascadedDevices: 4);
+            _spi = SpiDevice.Create(_hardwareSpiSettings);
+            _devices = new Max7219(_spi, cascadedDevices: 4);
             _devices.Init();
         }
 

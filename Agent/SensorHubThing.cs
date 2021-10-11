@@ -9,16 +9,16 @@ namespace Agent
 {
     public class SensorHubThing : IThing
     {
+        private const int _busId = 1;
+
         private readonly SensorHub _sh;
 
         public TimeSpan PollInterval => TimeSpan.FromSeconds(60);
 
         public SensorHubThing()
         {
-            const int I2cBusId = 1;
-
             // 0x17
-            _sh = new SensorHub(I2cDevice.Create(new(I2cBusId, SensorHub.DefaultI2cAddress)));
+            _sh = new SensorHub(I2cDevice.Create(new(_busId, SensorHub.DefaultI2cAddress)));
         }
 
         public async Task PollAsync(Monitor monitor)

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,6 +27,7 @@ namespace TheSwamp.Shared
                 {
                     if (!_dataSource.ContainsKey(dataSourceName))
                     {
+                        Console.WriteLine($"Adding datasource {dataSourceName}");
                         _dataSource.Add(dataSourceName, new DataSourcePointsCache(ds));
                     }
                 }
@@ -52,7 +52,7 @@ namespace TheSwamp.Shared
                 // Not averaging, just log changes
                 else
                 {
-                    if (ds.LatestValue != newValue)
+                    if (CanLog(ds, newValue))
                     {
                         ds.Values.Add(new DataPoint()
                         {
@@ -65,6 +65,20 @@ namespace TheSwamp.Shared
                     }
                 }
             }
+        }
+
+        private bool CanLog(DataSourcePointsCache ds, string value)
+        {
+            if (double.TryParse(ds.LatestValue, out double l) && double.TryParse(value, out double n))
+            {
+                var diff = Math.Abs(l - n);
+                if (ds.DataSource.AveragePrecision.HasValue)
+                {
+                    return diff > ds.DataSource.AveragePrecision.Value;
+                }
+                return diff > 0;
+            }
+            return true;
         }
 
 
@@ -89,9 +103,9 @@ namespace TheSwamp.Shared
 
                             var savg = avg.ToString();
 
-                            Console.WriteLine($"Averaging {c.Values.Count()} values ({savg})");
+                            Console.WriteLine($"[{c.DataSource.Name}] Averaging {c.Values.Count()} values ({savg})");
 
-                            if(savg != c.LastValue)
+                            if (savg != c.LastValue)
                             {
                                 data.Add(new DataPoint()
                                 {
@@ -100,11 +114,12 @@ namespace TheSwamp.Shared
                                     Value = savg
                                 });
 
-                                c.LastValue= savg;
+                                c.LastValue = savg;
                             }
                         }
                         else
                         {
+                            Console.WriteLine($"[{c.DataSource.Name}] Posting {c.Values.Count()} values");
                             data.AddRange(c.Values);
                         }
                         c.Values.Clear();
@@ -114,7 +129,7 @@ namespace TheSwamp.Shared
 
             await API.PostDataAsync(data);
 
-            Console.WriteLine($"flushed {data.Count()} items");
+            Console.WriteLine($"[{DateTime.Now:HH\\:mm}] Flushed {data.Count()} values");
         }
 
 
@@ -142,7 +157,7 @@ namespace TheSwamp.Shared
 
             public DataSource DataSource { get; private set; }
             public List<DataPoint> Values { get; private set; }
-            
+
             // LAst average value we posted
             public string LastValue { get; internal set; }
 

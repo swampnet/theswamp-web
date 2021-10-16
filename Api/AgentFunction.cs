@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TheSwamp.Api.DAL.IOT;
 using TheSwamp.Api.DAL.IOT.Entities;
+using TheSwamp.Api.Interfaces;
 using TheSwamp.Shared;
 
 namespace TheSwamp.Api
@@ -21,10 +22,12 @@ namespace TheSwamp.Api
         private readonly IConfiguration _cfg;
         private readonly IotContext _iotContext;
         private readonly ILogger<AgentFunction> _log;
+        private readonly IPostMessage _postMessage;
 
-        public AgentFunction(ILogger<AgentFunction> log, IConfiguration cfg, IotContext iotContext)
+        public AgentFunction(ILogger<AgentFunction> log, IPostMessage postMessage, IConfiguration cfg, IotContext iotContext)
         {
             _log = log;
+            _postMessage = postMessage;
             _cfg = cfg;
             _iotContext = iotContext;
         }
@@ -38,14 +41,7 @@ namespace TheSwamp.Api
                 var json = await reader.ReadToEndAsync();
                 var msg = JsonConvert.DeserializeObject<AgentMessage>(json);
                 msg.Properties.Add(new Property("client-ip", req.GetClientIp()));
-                await LogMessageAsync(msg);
-
-                await using (ServiceBusClient client = new ServiceBusClient(_cfg["azure.servicebus"]))
-                {
-                    var sender = client.CreateSender("iot_agent");
-                    var message = new ServiceBusMessage(json);
-                    await sender.SendMessageAsync(message);
-                }
+                await _postMessage.PostAsync(msg);
             }
 
             return new OkResult();
@@ -74,32 +70,6 @@ namespace TheSwamp.Api
                 .ToArrayAsync();
 
             return messages;
-        }
-
-
-
-        private async Task LogMessageAsync(AgentMessage msg)
-        {
-            var m = new Message()
-            {
-                Type = msg.Type
-            };
-
-            if(msg.Properties != null)
-            {
-                foreach(var p in msg.Properties)
-                {
-                    m.Properties.Add(new MessageProperty() { 
-                        Name = p.Name,
-                        Value = p.Value
-                    });
-                }
-            }
-
-            await _iotContext.Messages.AddAsync(m);
-            await _iotContext.SaveChangesAsync();
-
-            _log.LogInformation($"post from {msg.Properties.StringValue("ClientIp", "unknown")}");
         }
     }
 }

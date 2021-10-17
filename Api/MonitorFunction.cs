@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.WebJobs.Extensions.SignalRService;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -54,6 +55,7 @@ namespace TheSwamp.Api
         [FunctionName("monitor-post-values")]
         public async Task<IActionResult> PostValues(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "monitor")] HttpRequest req,
+            [SignalR(HubName = "serverlessSample")] IAsyncCollector<SignalRMessage> signalRMessages,
             ILogger log)
         {
             if (!await _auth.AuthenticateAsync(req))
@@ -67,6 +69,14 @@ namespace TheSwamp.Api
 
                 await _monitor.PostValuesAsync(JsonConvert.DeserializeObject<DataPoint[]>(json));
             }
+
+            var x = await _monitor.GetDataSourceSummaryAsync();
+            await signalRMessages.AddAsync(
+                new SignalRMessage
+                {
+                    Target = "monitor-values",
+                    Arguments = new[] { x }
+                });
 
             return new OkResult();
         }

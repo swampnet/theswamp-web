@@ -1,7 +1,8 @@
 ﻿@using System.Threading
 @using TheSwamp.Shared
+@using Microsoft.AspNetCore.SignalR.Client
 
-@implements IDisposable
+@implements IAsyncDisposable
 
 @inject HttpClient Http
 
@@ -40,33 +41,48 @@ else
     </table>    
 }
 
-    <div style="font-size:x-small">update: @DateTime.Now.ToLocalTime().ToString("HH\\:mm\\:ss")</div>
+    <div style="font-size:x-small">update: @_lastUpdate.ToLocalTime().ToString("HH\\:mm\\:ss")</div>
 
 @code {
 
+    private HubConnection hubConnection;
     private DataSourceSummary[] _values;
-    private Timer _timer;
-    
-    protected override void OnInitialized()
-    {
-        _timer = new Timer(new TimerCallback(async _ =>
-        {
-              try
-              {
-                _values = await Http.GetFromJsonAsync<DataSourceSummary[]>($"/api/monitor/summary");
+    private DateTime _lastUpdate = DateTime.Now;
 
-                this.StateHasChanged();
-              }
-              catch (Exception ex)
-              {
-                    Console.WriteLine(ex.ToString());
-              }        
-        }), null, 1000, 30000);
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _values = await Http.GetFromJsonAsync<DataSourceSummary[]>($"/api/monitor/summary");
+            _lastUpdate = DateTime.Now;
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl($"{Http.BaseAddress}api")
+                .Build();
+
+            hubConnection.On<DataSourceSummary[]>("monitor-values", (values) =>
+            {
+                _values = values;
+                _lastUpdate = DateTime.Now;
+                
+                StateHasChanged();
+            });
+
+            await hubConnection.StartAsync();
+
+            this.StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }        
     }
 
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        _timer?.Dispose();
+        if(hubConnection != null)
+        {
+            await hubConnection.DisposeAsync();            
+        }
     }
 }

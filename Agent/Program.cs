@@ -24,9 +24,10 @@ namespace Agent
 
             API.Initialise(cfg["api:endpoint"], cfg["api:key"]);
             var monitor = new Monitor(60000 * 5);
+            //var monitor = new Monitor(10000);
             var things = new List<IThing>()
             {
-                //new RandomNumberThing(),
+                new RandomNumberThing(),
                 new SensorHubThing(),
                 new Mcp3008Things()
             };

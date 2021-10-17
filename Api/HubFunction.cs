@@ -21,19 +21,5 @@ namespace TheSwamp.Api
         {
             return connectionInfo;
         }
-
-
-        //[FunctionName("broadcast")]
-        //public async Task Broadcast(
-        //    [TimerTrigger("0 * * * * *")] TimerInfo myTimer,
-        //    [SignalR(HubName = "serverlessSample")] IAsyncCollector<SignalRMessage> signalRMessages)
-        //{
-        //    await signalRMessages.AddAsync(
-        //        new SignalRMessage
-        //        {
-        //            Target = "tick",
-        //            Arguments = new[] { $"{DateTime.Now}" }
-        //        });
-        //}
     }
 }

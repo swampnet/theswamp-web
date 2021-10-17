@@ -29,6 +29,8 @@ namespace TheSwamp.Api
 
             builder.Services.AddTransient<IMonitor, MonitorService>();
             builder.Services.AddTransient<IAuth, Auth>();
+            builder.Services.AddTransient<IPostMessage, PostMessageService>();
+
 
             builder.Services.AddDbContext<TrackingContext>(options =>
                 options.UseSqlServer(cfg["connectionstring.swampnet"])
@@ -41,6 +43,7 @@ namespace TheSwamp.Api
             builder.Services.AddDbContext<IotContext>(options =>
                 options.UseSqlServer(cfg["connectionstring.swampnet"])
             );
+
         }
     }
 }

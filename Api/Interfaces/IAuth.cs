@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace TheSwamp.Api.Interfaces
 {
+
     public interface IAuth
     {
         Task<bool> AuthenticateAsync(HttpRequest req);

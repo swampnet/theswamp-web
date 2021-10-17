@@ -7,7 +7,7 @@ namespace Agent
     public class RandomNumberThing : IThing
     {
         private readonly Random _rng;
-        public TimeSpan PollInterval => TimeSpan.FromSeconds(60);
+        public TimeSpan PollInterval => TimeSpan.FromSeconds(5);
 
         public RandomNumberThing()
         {

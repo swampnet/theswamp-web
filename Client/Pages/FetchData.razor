@@ -1,9 +1,6 @@
 @page "/fetchdata"
 
 @using TheSwamp.Shared
-@using Microsoft.AspNetCore.SignalR.Client
-
-@inject HttpClient Http
 
 <h1>Fetch data</h1>
 
@@ -11,35 +8,8 @@
 
 <ValueSummaries />
 
-<div class="dev">
-    <ul>
-        @foreach (var message in messages)
-        {
-            <li>@message</li>
-        }
-    </ul>
-</div>
-
 
 @code {
 
-    private HubConnection hubConnection;
-    private List<string> messages = new List<string>();
 
-
-    protected override async Task OnInitializedAsync()
-    {
-        hubConnection = new HubConnectionBuilder()
-            .WithUrl($"{Http.BaseAddress}api")
-            .Build();
-
-        hubConnection.On<string>("tick", (message) =>
-        {
-            var encodedMsg = $"{message}";
-            messages.Add(encodedMsg);
-            StateHasChanged();
-        });
-
-        await hubConnection.StartAsync();
-    }
 }

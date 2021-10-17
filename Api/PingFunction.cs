@@ -13,26 +13,26 @@ namespace TheSwamp.Api
     public class PingFunction
     {
         private readonly IConfiguration _cfg;
-        private readonly IMyService _myService;
         private readonly IMonitor _devices;
 
-        public PingFunction(IConfiguration cfg, IMyService myService, IMonitor devices)
+        public PingFunction(IConfiguration cfg, IMonitor devices)
         {
             _cfg = cfg;
-            _myService = myService;
             _devices = devices;
         }
 
 
         [FunctionName("ping")]
-        public ActionResult<string> Run(
+        public async Task<ActionResult<string>> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
-            var x = _myService.Boosh();
-            log.LogInformation(x);
+            await Task.CompletedTask;
 
-            return x;// new OkObjectResult(x);
+            log.LogInformation("pong");
+
+
+            return new OkResult();
         }
 
         [FunctionName("devices")]

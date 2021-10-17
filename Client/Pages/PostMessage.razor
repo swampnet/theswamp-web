@@ -1,6 +1,7 @@
 ﻿@page "/post-message"
-@implements IDisposable
+@implements IAsyncDisposable
 
+@using Microsoft.AspNetCore.SignalR.Client
 
 @using System.Threading
 @using TheSwamp.Shared
@@ -38,26 +39,25 @@
     {
         <h3>Recent messages</h3>
 
-        <div class=led_messages>
-            @foreach (var m in _values)
+        <div class="led_messages">
+            @foreach (var m in _values.OrderByDescending(x => x.TimestampUtc))
             {
                 <div class="led-message" style="transform: rotate(@CalculateTilt(m)deg);background-color:@CalculateColor(m)">
                     @m.Properties.StringValue("content")
+                    <div>
+                        <span>@m.TimestampUtc.ToLocalTime().ToString("dd MMM yyyy HH\\:mm")</span>
+                    </div>
                 </div>
             }
         </div>
     }
 </div>
 
-<div>
-    <pre>
-        Status: @_status
-        BaseAddress: @Http.BaseAddress
-    </pre>
-</div>
 
 @code {
-    private AgentMessage[] _values;
+    private HubConnection hubConnection;
+
+    private List<AgentMessage> _values = new List<AgentMessage>();
     private string _message = "Hello!!";
     private string _result = "";
     private Timer _timer;
@@ -85,12 +85,20 @@
         "#f6baf6",
     };
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        _timer = new Timer(new TimerCallback(async _ =>
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl($"{Http.BaseAddress}api")
+            .Build();
+
+        hubConnection.On<AgentMessage>("led-message", (message) =>
         {
-            await RefreshHistoryAsync();
-        }), null, 0, 30000);
+            _values.Add(message);
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+        await RefreshHistoryAsync();
     }
 
 
@@ -99,7 +107,7 @@
         try
         {
             _status = "Loading recent messages";
-            _values = await Http.GetFromJsonAsync<AgentMessage[]>($"/api/agent/queue/led-matrix");
+            _values = await Http.GetFromJsonAsync<List<AgentMessage>>($"/api/agent/queue/led-matrix");
             _status = "";
 
             this.StateHasChanged();
@@ -117,12 +125,12 @@
         var x = _message;
         _message = "";
         _result = "Sending message: '" + x + "'";
-        
+
         await Http.PostAsJsonAsync($"/api/agent/queue", new AgentMessage()
         {
             Type = "led-matrix",
             Properties = new List<Property>()
-    {
+            {
                 new Property()
                 {
                     Name = "content",
@@ -132,8 +140,6 @@
         }, null);
 
         _result = "Sent message '" + x + "'";
-
-        await RefreshHistoryAsync();
     }
 
 
@@ -148,8 +154,11 @@
         return _messageColors[i];
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        _timer?.Dispose();
+        if(hubConnection != null)
+        {
+            await hubConnection.DisposeAsync();            
+        }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.WebJobs.Extensions.SignalRService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -34,7 +35,9 @@ namespace TheSwamp.Api
 
         [FunctionName("agent-post-message")]
         public async Task<IActionResult> PostMessage(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "agent/queue")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "agent/queue")] HttpRequest req,
+            [SignalR(HubName = "serverlessSample")] IAsyncCollector<SignalRMessage> signalRMessages
+            )
         {
             using (var reader = new StreamReader(req.Body))
             {
@@ -42,6 +45,13 @@ namespace TheSwamp.Api
                 var msg = JsonConvert.DeserializeObject<AgentMessage>(json);
                 msg.Properties.Add(new Property("client-ip", req.GetClientIp()));
                 await _postMessage.PostAsync(msg);
+
+                await signalRMessages.AddAsync(
+                    new SignalRMessage
+                    {
+                        Target = "led-message",
+                        Arguments = new[] { msg }
+                    });
             }
 
             return new OkResult();

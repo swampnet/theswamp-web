@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -11,7 +12,7 @@ using Microsoft.Azure.WebJobs.Extensions.SignalRService;
 
 namespace TheSwamp.Api
 {
-    public class HubFunction
+    public class HubFunction : ServerlessHub
     {
         [FunctionName("negotiate")]
         public SignalRConnectionInfo Negotiate(
@@ -21,16 +22,18 @@ namespace TheSwamp.Api
             return connectionInfo;
         }
 
-        [FunctionName("broadcast")]
-        public static async Task Broadcast([TimerTrigger("0 * * * * *")] TimerInfo myTimer,
-        [SignalR(HubName = "serverlessSample")] IAsyncCollector<SignalRMessage> signalRMessages)
-        {
-            await signalRMessages.AddAsync(
-                new SignalRMessage
-                {
-                    Target = "tick",
-                    Arguments = new[] { $"{DateTime.Now}" }
-                });
-        }
+
+        //[FunctionName("broadcast")]
+        //public async Task Broadcast(
+        //    [TimerTrigger("0 * * * * *")] TimerInfo myTimer,
+        //    [SignalR(HubName = "serverlessSample")] IAsyncCollector<SignalRMessage> signalRMessages)
+        //{
+        //    await signalRMessages.AddAsync(
+        //        new SignalRMessage
+        //        {
+        //            Target = "tick",
+        //            Arguments = new[] { $"{DateTime.Now}" }
+        //        });
+        //}
     }
 }

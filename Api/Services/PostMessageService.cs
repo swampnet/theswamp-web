@@ -37,6 +37,8 @@ namespace TheSwamp.Api.Services
                 var message = new ServiceBusMessage(JsonConvert.SerializeObject(msg));
                 await sender.SendMessageAsync(message);
             }
+
+            await BooshAsync($"From PostMessageServcie: {DateTime.Now}");
         }
 
         private async Task LogMessageAsync(AgentMessage msg)
@@ -65,5 +67,11 @@ namespace TheSwamp.Api.Services
         }
 
 
+        private Task BooshAsync(string message)
+        {
+            var connectionString = _cfg["AzureSignalRConnectionString"];
+
+            return Task.CompletedTask;
+        }
     }
 }

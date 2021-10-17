@@ -55,7 +55,7 @@
 
 
 @code {
-    private HubConnection hubConnection;
+    private HubConnection _hubConnection;
 
     private List<AgentMessage> _values = new List<AgentMessage>();
     private string _message = "Hello!!";
@@ -87,17 +87,23 @@
 
     protected override async Task OnInitializedAsync()
     {
-        hubConnection = new HubConnectionBuilder()
+        _hubConnection = new HubConnectionBuilder()
             .WithUrl($"{Http.BaseAddress}api")
             .Build();
 
-        hubConnection.On<AgentMessage>("led-message", (message) =>
+        _hubConnection.On<AgentMessage>("led-message", (message) =>
         {
             _values.Add(message);
             StateHasChanged();
         });
 
-        await hubConnection.StartAsync();
+        _hubConnection.Closed += async (ex) =>
+        {
+            // reconnect on close?
+            await _hubConnection.StartAsync();
+        };
+
+        await _hubConnection.StartAsync();
         await RefreshHistoryAsync();
     }
 
@@ -156,9 +162,9 @@
 
     public async ValueTask DisposeAsync()
     {
-        if(hubConnection != null)
+        if(_hubConnection != null)
         {
-            await hubConnection.DisposeAsync();            
+            await _hubConnection.DisposeAsync();            
         }
     }
 }

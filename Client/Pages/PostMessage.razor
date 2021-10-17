@@ -50,7 +50,10 @@
 </div>
 
 <div>
-    @_status
+    <pre>
+        Status: @_status
+        BaseAddress: @Http.BaseAddress
+    </pre>
 </div>
 
 @code {
@@ -114,7 +117,7 @@
         var x = _message;
         _message = "";
         _result = "Sending message: '" + x + "'";
-
+        
         await Http.PostAsJsonAsync($"/api/agent/queue", new AgentMessage()
         {
             Type = "led-matrix",

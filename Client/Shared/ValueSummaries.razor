@@ -6,9 +6,9 @@
 
 @inject HttpClient Http
 
-@if(_values == null)
+@if (_values == null)
 {
-    <div>Loading...</div>    
+    <div class="busy" />
 }
 else
 {
@@ -21,7 +21,7 @@ else
         </thead>
 
         <tbody>
-            @foreach(var val in _values.Where(v => v.LastUpdateOnUtc.HasValue))
+            @foreach (var val in _values.Where(v => v.LastUpdateOnUtc.HasValue))
             {
                 <tr>
                     <td>
@@ -38,10 +38,10 @@ else
                 </tr>
             }
         </tbody>
-    </table>    
+    </table>
 }
 
-    <div style="font-size:x-small">update: @_lastUpdate.ToLocalTime().ToString("HH\\:mm\\:ss")</div>
+<div style="font-size:x-small">update: @_lastUpdate.ToLocalTime().ToString("HH\\:mm\\:ss")</div>
 
 @code {
 
@@ -53,17 +53,17 @@ else
     {
         try
         {
-            _values = await Http.GetFromJsonAsync<DataSourceSummary[]>($"/api/monitor/summary");
+            _values = await Http.GetFromJsonAsync<DataSourceSummary[]>($"/api/log/data");
             _lastUpdate = DateTime.Now;
             hubConnection = new HubConnectionBuilder()
-                .WithUrl($"{Http.BaseAddress}api")
+                .WithUrl($"{Http.BaseAddress}api/hub")
                 .Build();
 
             hubConnection.On<DataSourceSummary[]>("monitor-values", (values) =>
             {
                 _values = values;
                 _lastUpdate = DateTime.Now;
-                
+
                 StateHasChanged();
             });
 
@@ -74,15 +74,15 @@ else
         catch (Exception ex)
         {
             Console.WriteLine(ex.ToString());
-        }        
+        }
     }
 
 
     public async ValueTask DisposeAsync()
     {
-        if(hubConnection != null)
+        if (hubConnection != null)
         {
-            await hubConnection.DisposeAsync();            
+            await hubConnection.DisposeAsync();
         }
     }
 }

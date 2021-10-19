@@ -1,5 +1,4 @@
-﻿using Azure.Messaging.ServiceBus;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -12,7 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TheSwamp.Api.DAL.IOT;
-using TheSwamp.Api.DAL.IOT.Entities;
 using TheSwamp.Api.Interfaces;
 using TheSwamp.Shared;
 
@@ -33,10 +31,10 @@ namespace TheSwamp.Api
             _iotContext = iotContext;
         }
 
-        [FunctionName("agent-post-message")]
+        [FunctionName("POST-agent-messages")]
         public async Task<IActionResult> PostMessage(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "agent/queue")] HttpRequest req,
-            [SignalR(HubName = "serverlessSample")] IAsyncCollector<SignalRMessage> signalRMessages
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "agent/messages")] HttpRequest req,
+            [SignalR(HubName = "theswamp")] IAsyncCollector<SignalRMessage> signalRMessages
             )
         {
             using (var reader = new StreamReader(req.Body))
@@ -58,17 +56,19 @@ namespace TheSwamp.Api
         }
 
 
-        [FunctionName("agent-recent-messages")]
-        public async Task<ActionResult<AgentMessage[]>> GetRecent(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "agent/queue/{type}")] HttpRequest req, 
-            string type)        
+        [FunctionName("GET-agent-messages")]
+        public async Task<ActionResult<AgentMessage[]>> GetRecentMessages(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "agent/messages")] HttpRequest req)
         {
-            var messages = await _iotContext.Messages
+            var type = req.Query["type"].SingleOrDefault();
+
+            return await _iotContext.Messages
                 .Include(f => f.Properties)
                 .Where(f => f.Type == type)
                 .OrderByDescending(f => f.TimestampUtc)
                 .Take(10)
-                .Select(m => new AgentMessage() { 
+                .Select(m => new AgentMessage()
+                {
                     Type = m.Type,
                     TimestampUtc = m.TimestampUtc,
                     Properties = m.Properties.Select(x => new Property()
@@ -78,8 +78,6 @@ namespace TheSwamp.Api
                     }).ToList()
                 })
                 .ToArrayAsync();
-
-            return messages;
         }
     }
 }

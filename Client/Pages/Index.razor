@@ -16,15 +16,16 @@
 </ul>
 
 <div class="dev">
-      <div>/.auth/me</div>
-	<pre>
+    <div>/.auth/me</div>
+    <pre>
 	    @_rs1
 	</pre>
-@*      <div>/api/auth</div>
-      <pre>
-	    @_rs2
-      </pre>
-*@</div>
+    @*      <div>/api/auth</div>
+        <pre>
+          @_rs2
+        </pre>
+    *@
+</div>
 
 @code {
 
@@ -33,24 +34,24 @@
 
     protected override async Task OnInitializedAsync()
     {
-      try
-      {
+        try
+        {
             _rs1 = "Loading...";
             _rs1 = await Http.GetStringAsync("/.auth/me");
-      }
-      catch (Exception ex)
-      {
+        }
+        catch (Exception ex)
+        {
             _rs1 = ex.Message;
-      }
+        }
 
-      //try
-      //{
-      //      _rs2 = "Loading...";
-      //      _rs2 = await Http.GetStringAsync("/api/auth");
-      //}
-      //catch (Exception ex)
-      //{
-      //      _rs2 = ex.Message;
-      //}
+        //try
+        //{
+        //      _rs2 = "Loading...";
+        //      _rs2 = await Http.GetStringAsync("/api/auth");
+        //}
+        //catch (Exception ex)
+        //{
+        //      _rs2 = ex.Message;
+        //}
     }
 }

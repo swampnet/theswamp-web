@@ -35,7 +35,7 @@ namespace TheSwamp.Shared
 
         public static async Task<DataSource> GetDeviceAsync(string name)
         {
-            string url = $"{_endpoint}/api/log/device?name={name}";
+            string url = $"{_endpoint}/api/log/data/device?name={name}";
             using (var rs = await Client.GetAsync(url))
             {
                 rs.EnsureSuccessStatusCode();
@@ -57,6 +57,18 @@ namespace TheSwamp.Shared
                     var rs = await Client.PostAsync(url, content);
                     rs.EnsureSuccessStatusCode();
                 }
+            }
+        }
+
+
+        public static async Task PostMessageAsync(AgentMessage msg)
+        {
+            string url = $"{_endpoint}/api/agent/messages";
+
+            using (var content = new StringContent(JsonConvert.SerializeObject(msg), Encoding.UTF8, "application/json"))
+            {
+                var rs = await Client.PostAsync(url, content);
+                rs.EnsureSuccessStatusCode();
             }
         }
     }

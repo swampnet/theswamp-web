@@ -4,6 +4,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 using TheSwamp.Api.Interfaces;
 using TheSwamp.Shared;
@@ -13,12 +14,10 @@ namespace TheSwamp.Api
     public class PingFunction
     {
         private readonly IConfiguration _cfg;
-        private readonly IMonitor _devices;
 
-        public PingFunction(IConfiguration cfg, IMonitor devices)
+        public PingFunction(IConfiguration cfg)
         {
             _cfg = cfg;
-            _devices = devices;
         }
 
 
@@ -31,17 +30,7 @@ namespace TheSwamp.Api
 
             log.LogInformation("pong");
 
-
-            return new OkResult();
-        }
-
-        [FunctionName("devices")]
-        public async Task<ActionResult<DataSource[]>> Devices(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
-            ILogger log)
-        {
-            var x = await _devices.GetDevicesAsync();
-            return x;
+            return new OkObjectResult($"pong @ {DateTime.Now}");
         }
     }
 }

@@ -35,7 +35,7 @@ namespace TheSwamp.Shared
 
         public static async Task<DataSource> GetDeviceAsync(string name)
         {
-            string url = $"{_endpoint}/api/monitor?dataSource={name}";
+            string url = $"{_endpoint}/api/log/device?name={name}";
             using (var rs = await Client.GetAsync(url))
             {
                 rs.EnsureSuccessStatusCode();
@@ -50,7 +50,7 @@ namespace TheSwamp.Shared
         {
             if (data.Any())
             {
-                string url = $"{_endpoint}/api/monitor";
+                string url = $"{_endpoint}/api/log/data";
 
                 using (var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json"))
                 {

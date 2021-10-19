@@ -13,6 +13,87 @@ using TheSwamp.Shared;
 
 namespace TheSwamp.Api
 {
+    /// <summary>
+    /// Log / search data
+    /// </summary>
+    public class LogDataFunction
+    {
+        private readonly IAuth _auth;
+        private readonly IMonitor _monitor;
+
+        public LogDataFunction(IAuth auth, IMonitor monitor)
+        {
+            _auth = auth;
+            _monitor = monitor;
+        }
+
+
+        [FunctionName("GET-log-data-device")]
+        public async Task<IActionResult> GetDevice(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "log/data/device")] HttpRequest req,
+            ILogger log)
+        {
+            if (!await _auth.AuthenticateAsync(req))
+            {
+                return new UnauthorizedResult();
+            }
+
+            var name = req.Query["name"];
+
+            log.LogInformation($"Get device: {name}");
+
+            var x = await _monitor.GetDeviceAsync(req.Query["name"]);
+
+            return new OkObjectResult(x);
+        }
+
+
+        [FunctionName("GET-log-data")]
+        public async Task<IActionResult> Get(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "log/data")] HttpRequest req,
+            ILogger log)
+        {
+            log.LogDebug("Get summary");
+
+            var x = await _monitor.GetDataSourceSummaryAsync();
+
+            return new OkObjectResult(x);
+        }
+
+
+        [FunctionName("POST-log-data")]
+        public async Task<IActionResult> PostValues(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "log/data")] HttpRequest req,
+            [SignalR(HubName = "theswamp")] IAsyncCollector<SignalRMessage> signalRMessages,
+            ILogger log)
+        {
+            if (!await _auth.AuthenticateAsync(req))
+            {
+                return new UnauthorizedResult();
+            }
+
+            using (var reader = new StreamReader(req.Body))
+            {
+                var json = await reader.ReadToEndAsync();
+
+                await _monitor.PostValuesAsync(JsonConvert.DeserializeObject<DataPoint[]>(json));
+            }
+
+            var x = await _monitor.GetDataSourceSummaryAsync();
+            await signalRMessages.AddAsync(
+                new SignalRMessage
+                {
+                    Target = "monitor-values",
+                    Arguments = new[] { x }
+                });
+
+            return new OkResult();
+        }
+
+    }
+
+
+    [Obsolete("Use LogDataFunction")]
     public class MonitorFunction
     {
         private readonly IAuth _auth;
@@ -55,7 +136,7 @@ namespace TheSwamp.Api
         [FunctionName("monitor-post-values")]
         public async Task<IActionResult> PostValues(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "monitor")] HttpRequest req,
-            [SignalR(HubName = "serverlessSample")] IAsyncCollector<SignalRMessage> signalRMessages,
+            [SignalR(HubName = "theswamp")] IAsyncCollector<SignalRMessage> signalRMessages,
             ILogger log)
         {
             if (!await _auth.AuthenticateAsync(req))

@@ -33,7 +33,7 @@
 <div style="margin:30px">
     @if (_values == null)
     {
-        <img style="display:block;margin-left:auto;margin-right:auto;width:20%" src="img/Spin-1s-200px.svg" width="20" height="20" />
+        <div class="busy" />
     }
     else
     {
@@ -57,7 +57,7 @@
 @code {
     private HubConnection _hubConnection;
 
-    private List<AgentMessage> _values = new List<AgentMessage>();
+    private List<AgentMessage> _values;// = new List<AgentMessage>();
     private string _message = "Hello!!";
     private string _result = "";
     private Timer _timer;
@@ -88,7 +88,7 @@
     protected override async Task OnInitializedAsync()
     {
         _hubConnection = new HubConnectionBuilder()
-            .WithUrl($"{Http.BaseAddress}api")
+            .WithUrl($"{Http.BaseAddress}api/hub")
             .Build();
 
         _hubConnection.On<AgentMessage>("led-message", (message) =>
@@ -113,7 +113,7 @@
         try
         {
             _status = "Loading recent messages";
-            _values = await Http.GetFromJsonAsync<List<AgentMessage>>($"/api/agent/queue/led-matrix");
+            _values = await Http.GetFromJsonAsync<List<AgentMessage>>($"/api/agent/messages?type=led-matrix");
             _status = "";
 
             this.StateHasChanged();
@@ -132,7 +132,7 @@
         _message = "";
         _result = "Sending message: '" + x + "'";
 
-        await Http.PostAsJsonAsync($"/api/agent/queue", new AgentMessage()
+        await Http.PostAsJsonAsync($"/api/agent/messages", new AgentMessage()
         {
             Type = "led-matrix",
             Properties = new List<Property>()

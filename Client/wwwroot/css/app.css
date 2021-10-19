@@ -183,8 +183,22 @@ app {
     }
 }
 
+
+.busy {
+    margin: auto;
+    width: 100px;
+    height: 100px;
+    background-image: url('../img/Spin-1s-200px.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
 .dev{
     font-size: small;
+    color:darkgreen;
+    border: dashed 1px lightgray;
+    padding:10px;
 }
 
 .led-background {

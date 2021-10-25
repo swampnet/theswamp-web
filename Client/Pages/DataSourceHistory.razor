@@ -1,0 +1,61 @@
+@page "/fetchdata/{device}"
+@inject HttpClient Http
+
+@using Plotly.Blazor.LayoutLib
+@using Plotly.Blazor.Traces.ScatterLib
+@using TheSwamp.Shared
+
+@if (_data == null)
+{
+    <div class="busy" />
+}
+else
+{
+    <PlotlyChart @bind-Config="_config" @bind-Layout="_layout" @bind-Data="_data" @ref="_chart" />
+}
+
+@code {
+    [Parameter]
+    public string Device { get; set; }
+
+    private DataSourceSummary _dataSource;
+    private IList<ITrace> _data;
+    private Layout _layout;
+    private PlotlyChart _chart;
+    private Config _config = new Config();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _dataSource = await Http.GetFromJsonAsync<DataSourceSummary>($"/api/log/data/" + Device);
+
+        _layout = new Layout()
+        {
+            Calendar = Plotly.Blazor.LayoutLib.CalendarEnum.Gregorian,
+            Title = new Plotly.Blazor.LayoutLib.Title()
+            {
+                Text = _dataSource.Name
+            },
+            YAxis = new List<YAxis>
+            {
+                new YAxis()
+                {
+                    Title = new Plotly.Blazor.LayoutLib.YAxisLib.Title()
+                    {
+                        Text = _dataSource.Units
+                    }
+                }
+            }
+        };
+
+        _data = new List<ITrace>
+        {
+            new Scatter
+            {
+                Name = "ScatterTrace",
+                Mode = ModeFlag.Lines | ModeFlag.Markers,
+                X = _dataSource.Values.OrderBy(x => x.TimestampUtc).Select(x => (object)x.TimestampUtc.ToLocalTime()).ToList(),
+                Y = _dataSource.Values.OrderBy(x => x.TimestampUtc).Select(x => (object)Convert.ToDouble(x.Value)).ToList()
+            }
+        };
+    }
+}

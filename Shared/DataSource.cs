@@ -13,7 +13,10 @@ namespace TheSwamp.Shared
         public DateTime? LastUpdateOnUtc { get; set; }
         public string LastValue { get; set; }
         public int UpdateCount { get; set; }
+
+        public DataPoint[] Values { get; set; }
     }
+
 
 
     public class DataSource

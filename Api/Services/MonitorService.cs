@@ -20,6 +20,24 @@ namespace TheSwamp.Api.Services
             _trackingContext = trackingContext;
         }
 
+        public Task<DataSourceSummary> GetHistory(string device)
+        {
+            return _trackingContext.DataSources
+                .Select(x => new DataSourceSummary()
+                {
+                    Id = x.Id,
+                    Description = x.Description,
+                    Units = x.Units,
+                    Name = x.Name,
+                    LastUpdateOnUtc = x.Values.OrderByDescending(v => v.TimestampUtc).FirstOrDefault().TimestampUtc,
+                    LastValue = x.Values.OrderByDescending(v => v.TimestampUtc).FirstOrDefault().Value,
+                    UpdateCount = x.Values.Count(),
+                    Values = x.Values.ToArray()
+                })
+                .SingleOrDefaultAsync(x => x.Name == device);
+        }
+
+
         public Task<DataSourceSummary[]> GetDataSourceSummaryAsync()
         {
             var query = _trackingContext.DataSources

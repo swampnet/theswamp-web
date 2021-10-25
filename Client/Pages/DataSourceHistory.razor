@@ -1,0 +1,47 @@
+@page "/fetchdata/{device}"
+@inject HttpClient Http
+
+@using Plotly.Blazor.Traces.ScatterLib
+@using TheSwamp.Shared
+
+<h1>@Device History</h1>
+
+@if (_dataSource == null)
+{
+    <div class="busy" />
+}
+else
+{
+    <PlotlyChart @bind-Config="config" @bind-Layout="layout" @bind-Data="_data" @ref="chart" />
+}
+
+@code {
+        [Parameter]
+        public string Device { get; set; }
+    private DataSourceSummary _dataSource;
+    IList<ITrace> _data;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _dataSource = await Http.GetFromJsonAsync<DataSourceSummary>($"/api/log/data/" + Device);
+
+        // Using of the interface IList is important for the event callback!
+        _data = new List<ITrace>
+        {
+            new Scatter
+            {
+                Name = "ScatterTrace",
+                Mode = ModeFlag.Lines | ModeFlag.Markers,
+                X = _dataSource.Values.OrderBy(x => x.TimestampUtc).Select(x => (object)x.TimestampUtc.ToLocalTime()).ToList(),
+                Y = _dataSource.Values.OrderBy(x => x.TimestampUtc).Select(x => (object)Convert.ToDouble(x.Value)).ToList()
+            }
+        };
+    }
+
+    PlotlyChart chart;
+    Config config = new Config();
+    Layout layout = new Layout() 
+    { 
+        Calendar = Plotly.Blazor.LayoutLib.CalendarEnum.Gregorian        
+    };
+}

@@ -15,8 +15,8 @@ else
 }
 
 @code {
-    [Parameter]
-    public string Device { get; set; }
+        [Parameter]
+        public string Device { get; set; }
 
     private DataSourceSummary _dataSource;
     private IList<ITrace> _data;
@@ -58,4 +58,11 @@ else
             }
         };
     }
+
+    PlotlyChart chart;
+    Config config = new Config();
+    Layout layout = new Layout() 
+    { 
+        Calendar = Plotly.Blazor.LayoutLib.CalendarEnum.Gregorian        
+    };
 }

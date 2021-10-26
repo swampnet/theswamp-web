@@ -13,5 +13,6 @@ namespace TheSwamp.Api.Interfaces
         Task<DataPoint[]> GetValuesAsync(int deviceId);
         Task<DataSource> GetDeviceAsync(string deviceName);
         Task PostValuesAsync(DataPoint[] deviceValues);
+        Task<DataSourceSummary> GetHistory(string device);
     }
 }

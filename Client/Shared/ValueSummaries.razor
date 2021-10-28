@@ -26,6 +26,10 @@ else
                 <tr>
                     <td>
                         <a href="fetchdata/@val.Name">@val.Name</a>
+                        @if (!string.IsNullOrEmpty(val.Description))
+                        {
+                            <div style="font-size:smaller;font-style:italic">@val.Description</div>
+                        }
                         <div style="font-size:x-small">@val.LastUpdateOnUtc.GetValueOrDefault().ToLocalTime().ToString("dd MMM yyyy HH\\:mm")</div>
                     </td>
                     <td>

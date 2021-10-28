@@ -70,7 +70,8 @@ namespace Agent
                 new RandomNumberThing(),
                 new SendMessageThing(),
                 new SensorHubThing(),
-                new Mcp3008Things()
+                new Mcp3008Things(),
+                new CpuTemperatureThing()
             };
 
             var queueHandler = new AgentQueueHandler(Cfg);

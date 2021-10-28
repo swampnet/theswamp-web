@@ -17,6 +17,9 @@ namespace Agent
         // basically which pin we read from
         readonly int _channel_pot = 0;
         readonly int _channel_moisture_01 = 1;
+        readonly int _channel_moisture_02 = 2;
+        readonly int _channel_moisture_03 = 3;
+        readonly int _channel_moisture_04 = 4;
 
         public TimeSpan PollInterval => TimeSpan.FromMilliseconds(500);
 
@@ -36,6 +39,9 @@ namespace Agent
         {
             await monitor.AddDataPointAsync("POT", Read(_channel_pot));
             await monitor.AddDataPointAsync("Moisture 01", Read(_channel_moisture_01));
+            await monitor.AddDataPointAsync("Moisture 02", Read(_channel_moisture_02));
+            await monitor.AddDataPointAsync("Moisture 03", Read(_channel_moisture_03));
+            await monitor.AddDataPointAsync("Moisture 04", Read(_channel_moisture_04));
         }
 
 

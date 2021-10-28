@@ -11,6 +11,7 @@
 }
 else
 {
+    <h1>@_dataSource.Name</h1>
     <PlotlyChart @bind-Config="_config" @bind-Layout="_layout" @bind-Data="_data" @ref="_chart" />
 }
 
@@ -31,10 +32,12 @@ else
         _layout = new Layout()
         {
             Calendar = Plotly.Blazor.LayoutLib.CalendarEnum.Gregorian,
-            Title = new Plotly.Blazor.LayoutLib.Title()
-            {
-                Text = _dataSource.Name
-            },
+            Title = string.IsNullOrEmpty(_dataSource.Description)
+                ? null
+                : new Plotly.Blazor.LayoutLib.Title()
+                {
+                    Text = _dataSource.Description
+                },
             YAxis = new List<YAxis>
             {
                 new YAxis()
@@ -61,8 +64,8 @@ else
 
     PlotlyChart chart;
     Config config = new Config();
-    Layout layout = new Layout() 
-    { 
-        Calendar = Plotly.Blazor.LayoutLib.CalendarEnum.Gregorian        
+    Layout layout = new Layout()
+    {
+        Calendar = Plotly.Blazor.LayoutLib.CalendarEnum.Gregorian
     };
 }

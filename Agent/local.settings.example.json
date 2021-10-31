@@ -1,6 +1,14 @@
 {
   "api": {
     "endpoint": "http://localhost:7071",
-    "key": "<api-key>"
-  }
+    "key": "<API-KEY>"
+  },
+  "azure.servicebus": "<CONNECTION-STRING>",
+  "time-quotes": [
+    "Ding dong, it's {{now}}",
+    "Boomshakalaka, it's {{now}}",
+    "Heeeyo, it's {{now}}",
+    "It's chico time! Actually, no, it's {{now}}",
+    "Stop your grinnin' and drop your linen, it's {{now}}"
+  ]
 }

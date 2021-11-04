@@ -5,7 +5,7 @@ using Iot.Device.CpuTemperature;
 
 namespace Agent
 {
-    public class CpuTemperatureThing : IThing
+    public class CpuTemperatureThing : ISampleProvider
     {
         public TimeSpan PollInterval => TimeSpan.FromMinutes(5);
         private CpuTemperature _cpuTemp = new CpuTemperature();

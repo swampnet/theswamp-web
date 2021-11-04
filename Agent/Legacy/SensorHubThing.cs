@@ -7,7 +7,7 @@ using TheSwamp.Shared;
 
 namespace Agent
 {
-    public class SensorHubThing : IThing
+    public class SensorHubThing : ISampleProvider
     {
         private const int _busId = 1;
 

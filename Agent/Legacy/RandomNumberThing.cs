@@ -4,7 +4,7 @@ using TheSwamp.Shared;
 
 namespace Agent
 {
-    public class RandomNumberThing : IThing
+    public class RandomNumberThing : ISampleProvider
     {
         private readonly Random _rng;
         public TimeSpan PollInterval => TimeSpan.FromSeconds(5);

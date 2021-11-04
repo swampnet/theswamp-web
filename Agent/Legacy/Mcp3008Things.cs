@@ -6,7 +6,7 @@ using TheSwamp.Shared;
 
 namespace Agent
 {
-    class Mcp3008Things : IThing
+    class Mcp3008Things : ISampleProvider
     {
         private const int _chipSelectLine = 1;
         private const int _busId = 0;

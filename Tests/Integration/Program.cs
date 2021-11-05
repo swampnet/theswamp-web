@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Azure.Messaging.ServiceBus;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Spectre.Console;
 using System;
 using System.Diagnostics;
@@ -22,7 +24,6 @@ namespace Integration
 
             API.Initialise(_cfg["api:endpoint"], _cfg["api:key"]);
 
-
             while (true)
             {
                 var cmd = AnsiConsole.Prompt(
@@ -30,7 +31,9 @@ namespace Integration
                             .Title("Select [green]option[/]?")
                             .MoreChoicesText("[grey](Move up and down)[/]")
                             .AddChoices(new[] { 
-                                "Get details"
+                                "Get details",
+                                "Pump 1",
+                                "Pump 2"
                             }));
 
                 switch (cmd)
@@ -40,10 +43,38 @@ namespace Integration
                         var x = await API.GetDeviceAsync("test-01");
                         AnsiConsole.WriteLine(x.ToString());
                         break;
+
+                    case "Pump 1":
+                        await EnqueueAsync(new AgentMessage() {
+                            Type = "activate-pump",
+                            Properties = new System.Collections.Generic.List<Property>() { 
+                                new Property("channel", "1")
+                            }
+                        });
+                        break;
+
+                    case "Pump 2":
+                        await EnqueueAsync(new AgentMessage()
+                        {
+                            Type = "activate-pump",
+                            Properties = new System.Collections.Generic.List<Property>() {
+                                new Property("channel", "2")
+                            }
+                        });
+                        break;
                 }
             }
         }
 
-        
+
+        private static async Task EnqueueAsync(AgentMessage msg)
+        {
+            await using (ServiceBusClient client = new ServiceBusClient(_cfg["azure.servicebus"]))
+            {
+                var sender = client.CreateSender("iot_agent");
+                var message = new ServiceBusMessage(JsonConvert.SerializeObject(msg));
+                await sender.SendMessageAsync(message);
+            }
+        }
     }
 }

@@ -23,7 +23,7 @@ namespace Agent.QueueHandlers
             return msg.Type.EqualsNoCase("activate-pump");
         }
 
-        public Task ProcessAsync(AgentMessage msg)
+        public async Task ProcessAsync(AgentMessage msg)
         {
             var channel = msg.Properties.IntValue("channel", -1);
             if(channel == -1)
@@ -38,17 +38,25 @@ namespace Agent.QueueHandlers
             }
 
             // @TODO: From cfg
-            if (lastActive.Add(TimeSpan.FromMinutes(5)) < DateTime.UtcNow)
+            var cooldown = TimeSpan.FromMinutes(1);
+
+            var x = DateTime.UtcNow - lastActive;
+
+            if (x > cooldown)
             {
-                Console.WriteLine($"@TODO: Activate pump {channel}!");
+                // Activate pump for <time> seconds.
+                // Note that each pump (ie, channel) might need a different time (longer hoses, different pump types etc)
+                var d = 1000;
+                Console.WriteLine($"@TODO: Activate pump {channel} - {d}ms");
+                await Task.Delay(d);
+                Console.WriteLine($"@TODO: Deactivate pump {channel}!");
+
                 _lastActivation[channel] = DateTime.UtcNow;
             }
             else
             {
-                Console.WriteLine($"Throttled pump {channel} (Last activated {lastActive})");
+                Console.WriteLine($"Throttled pump {channel} (cooldown {cooldown-x})");
             }
-
-            return Task.CompletedTask;
         }
     }
 }

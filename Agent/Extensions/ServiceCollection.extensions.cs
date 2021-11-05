@@ -20,5 +20,16 @@ namespace Agent
 
             return serviceCollection;
         }
+
+
+        public static ServiceCollection UseQueueHandlers(this ServiceCollection serviceCollection)
+        {
+            serviceCollection.AddSingleton<AgentQueueHandler>();
+
+            serviceCollection.AddSingleton<IQueueHandler, QueueHandlers.LedMatrixMessageHandler>();
+            serviceCollection.AddSingleton<IQueueHandler, QueueHandlers.ActivatePumpMessageHandler>();
+
+            return serviceCollection;
+        }
     }
 }

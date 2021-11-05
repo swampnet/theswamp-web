@@ -10,28 +10,15 @@ using TheSwamp.Shared;
 
 namespace Agent
 {
-    public class MessageReceivedEventArgs : EventArgs
-    {
-        public MessageReceivedEventArgs(AgentMessage msg)
-        {
-            Message = msg;
-        }
-
-        public AgentMessage Message { get; private set; }
-    }
-
-
     internal class AgentQueueHandler
     {
-        public event EventHandler<MessageReceivedEventArgs> MessageReceived;
-
         private readonly IConfiguration _cfg;
-        private readonly LedMatrixMessageHandler _handler;
+        private readonly IEnumerable<IQueueHandler> _queueHandlers;
 
-        public AgentQueueHandler(IConfiguration cfg)
+        public AgentQueueHandler(IConfiguration cfg, IEnumerable<IQueueHandler> queueHandlers)
         {
             _cfg = cfg;
-            _handler = new LedMatrixMessageHandler(_cfg);
+            _queueHandlers = queueHandlers;
         }
 
         public async Task StartAsync()
@@ -41,6 +28,8 @@ namespace Agent
             servicebusProcessor.ProcessMessageAsync += ProcessMessageAsync;
             servicebusProcessor.ProcessErrorAsync += ProcessErrorAsync;
             await servicebusProcessor.StartProcessingAsync();
+
+            Console.WriteLine($"{GetType().Name} Start ({_queueHandlers.Count()} handlers)");
         }
 
 
@@ -55,19 +44,20 @@ namespace Agent
         {
             string json = arg.Message.Body.ToString();
             var msg = JsonConvert.DeserializeObject<AgentMessage>(json);
-            Console.WriteLine($"Message Q:{arg.Message.MessageId} received");
+            Console.WriteLine($"[{msg.Type}] Q:{arg.Message.MessageId} received");
             await arg.CompleteMessageAsync(arg.Message);
 
-            MessageReceived?.Invoke(this, new MessageReceivedEventArgs(msg));
-
-            try
+            foreach (var handler in _queueHandlers.Where(h => h.CanProcess(msg)))
             {
-                // @TODO: Find right handler(s) for msg.Type
-                await _handler.ProcessAsync(msg);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
+                try
+                {
+                    Console.WriteLine($"{handler.GetType().Name} Processing message {msg.Type}");
+                    await handler.ProcessAsync(msg);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Handler {handler.GetType().Name} failed for message: {msg.Type}:\n"+ex);
+                }
             }
         }
     }

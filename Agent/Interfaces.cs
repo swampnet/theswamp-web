@@ -17,4 +17,10 @@ namespace Agent
         void Initialise(DeviceConfig cfg);
         Task<double?> ReadAsync(IEnumerable<IProperty> parameters);
     }
+
+    interface IQueueHandler
+    {
+        bool CanProcess(AgentMessage msg);
+        Task ProcessAsync(AgentMessage msg);
+    }
 }

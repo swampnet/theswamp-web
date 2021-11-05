@@ -29,11 +29,13 @@ namespace Agent
                 var serviceCollection = new ServiceCollection();
                 serviceCollection.AddSingleton<Program>();
                 serviceCollection.AddSingleton<IConfiguration>(cfg);
-
-                serviceCollection.UseSampleCollection();
                 
-                var serviceProvider = serviceCollection.BuildServiceProvider();
-                await serviceProvider.GetService<Program>().RunAsync();
+                serviceCollection.UseSampleCollection();
+                serviceCollection.UseQueueHandlers();
+                                
+                await serviceCollection.BuildServiceProvider()
+                    .GetService<Program>()
+                    .RunAsync();
             }
             catch (Exception ex)
             {
@@ -45,16 +47,20 @@ namespace Agent
         private int _tick = 0;
         private readonly ISamples _samples;
         private readonly IConfiguration _cfg;
+        private readonly AgentQueueHandler _queueHandler;
 
-        public Program(IConfiguration cfg, ISamples samples)
+        public Program(IConfiguration cfg, ISamples samples, AgentQueueHandler queueHandler)
         {
             _samples = samples;
             _cfg = cfg;
+            _queueHandler = queueHandler;
         }
 
 
         public async Task RunAsync()
         {
+            await _queueHandler.StartAsync();
+
             // Main loop
             while (true)
             {

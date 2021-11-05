@@ -17,10 +17,4 @@ namespace Agent
         void Initialise(DeviceConfig cfg);
         Task<double?> ReadAsync(IEnumerable<IProperty> parameters);
     }
-
-    interface ISampleProvider
-    {
-        TimeSpan PollInterval { get; }
-        Task PollAsync(Monitor monitor);
-    }
 }

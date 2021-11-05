@@ -42,12 +42,14 @@ namespace Agent
             Console.WriteLine("bye!");
         }
 
-
+        private int _tick = 0;
         private readonly ISamples _samples;
+        private readonly IConfiguration _cfg;
 
-        public Program(ISamples samples)
+        public Program(IConfiguration cfg, ISamples samples)
         {
             _samples = samples;
+            _cfg = cfg;
         }
 
 
@@ -66,9 +68,27 @@ namespace Agent
                 }
                 finally
                 {
-                    await Task.Delay(1000);
+                    await Wait();
                 }
             }
+        }
+
+
+        private async Task Wait()
+        {
+            var x = Convert.ToInt32(_cfg["tick"]);
+            if (x <= 0)
+            {
+                x = 1000 * 60; // Default to one minute
+            }
+
+            if (x != _tick)
+            {
+                _tick = x;
+                Console.WriteLine($"Tick delay: {_tick}");
+            }
+
+            await Task.Delay(_tick);
         }
 
         #region Legacy

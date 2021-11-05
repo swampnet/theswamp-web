@@ -7,19 +7,6 @@ using TheSwamp.Shared;
 
 namespace Agent
 {
-    class SampleDefinition
-    {
-        public string Name { get; set; }
-        public string Device { get; set; }
-        public TimeSpan Frequency { get; set; }
-        public double? MinChange { get; set; }
-        public Property[] Cfg { get; set; }
-        public DateTime? LastSampleOn { get; set; }
-        public bool IsInProgress { get; internal set; } = false;
-        public double? LastValue { get; internal set; }
-    }
-
-    
     class SamplesService : ISamples
     {
         private readonly IConfiguration _cfg;
@@ -47,6 +34,9 @@ namespace Agent
                 if (due.Any())
                 {
                     Console.WriteLine($" - {due.Count()} due");
+                    
+                    var values = new List<DataPoint>();
+
                     foreach (var sampleDefinition in due)
                     {
                         try
@@ -58,15 +48,30 @@ namespace Agent
                                 throw new NullReferenceException($"Device for {sampleDefinition.Name} not found ({sampleDefinition.Device})");
                             }
 
-                            var val = await device.ReadAsync(sampleDefinition.Cfg);
+                            // Hook up external dataSource id we don't already have it
+                            if(sampleDefinition.DataSource == null)
+                            {
+                                Console.Write($"Resolving datasource for '{sampleDefinition.Name}'");
+                                sampleDefinition.DataSource = await API.GetDeviceAsync(sampleDefinition.Name);
+                                Console.WriteLine($" - id: {sampleDefinition.DataSource.Id}");
+                            }
+
+                            var val = (await device.ReadAsync(sampleDefinition.Cfg)).Process(sampleDefinition);
                             if (val.HasValue)
                             {
-                                Console.Write($"{sampleDefinition.Name}: {sampleDefinition.LastValue:0.000} -> {val:0.000}");
+                                sampleDefinition.LastSampleOn = DateTime.UtcNow;
+
+                                Console.Write($"{sampleDefinition.Name}: {sampleDefinition.LastValue} -> {val}");
 
                                 if (sampleDefinition.CanUpdate(val.Value))
                                 {
-                                    sampleDefinition.LastValue = val;
                                     Console.Write(" - updated");
+                                    sampleDefinition.LastValue = val;
+                                    values.Add(new DataPoint() { 
+                                        DataSourceId = sampleDefinition.DataSource.Id,
+                                        Value = val.ToString(),
+                                        TimestampUtc = sampleDefinition.LastSampleOn.Value
+                                    });
                                 }
                                 else
                                 {
@@ -75,7 +80,7 @@ namespace Agent
 
                                 Console.WriteLine();
 
-                                sampleDefinition.LastSampleOn = DateTime.UtcNow;
+                                
                             }
                         }
                         catch (Exception ex)
@@ -86,6 +91,12 @@ namespace Agent
                         {
                             sampleDefinition.IsInProgress = false;
                         }
+                    }
+
+                    if (values.Any())
+                    {
+                        Console.WriteLine($"Posting {values.Count()} values");
+                        await API.PostDataAsync(values);
                     }
                 }
             }

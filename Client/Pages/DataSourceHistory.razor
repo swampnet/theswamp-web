@@ -24,7 +24,7 @@ else
     private Layout _layout;
     private PlotlyChart _chart;
     private Config _config = new Config();
-
+    
     protected override async Task OnInitializedAsync()
     {
         _dataSource = await Http.GetFromJsonAsync<DataSourceSummary>($"/api/log/data/" + Device);
@@ -61,11 +61,4 @@ else
             }
         };
     }
-
-    PlotlyChart chart;
-    Config config = new Config();
-    Layout layout = new Layout()
-    {
-        Calendar = Plotly.Blazor.LayoutLib.CalendarEnum.Gregorian
-    };
 }

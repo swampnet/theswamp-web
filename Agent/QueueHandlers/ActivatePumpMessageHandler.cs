@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Device.Gpio;
 using System.Device.Spi;
 using System.Threading.Tasks;
 using TheSwamp.Shared;
@@ -12,6 +13,7 @@ namespace Agent.QueueHandlers
     {
         private readonly IConfiguration _cfg;
         private readonly Dictionary<int, DateTime> _lastActivation = new Dictionary<int, DateTime>();
+        private GpioController _gpio;
 
         public ActivatePumpMessageHandler(IConfiguration cfg)
         {
@@ -31,14 +33,20 @@ namespace Agent.QueueHandlers
                 throw new ArgumentException("Missing channel");
             }
 
+            if(_gpio == null)
+            {
+                _gpio = new GpioController(PinNumberingScheme.Board);
+            }
+
             DateTime lastActive;
             if(!_lastActivation.TryGetValue(channel, out lastActive))
             {
                 lastActive = DateTime.MinValue;
+                _gpio.OpenPin(channel, PinMode.Output, PinValue.High);
             }
 
             // @TODO: From cfg
-            var cooldown = TimeSpan.FromMinutes(1);
+            var cooldown = TimeSpan.FromSeconds(10);
 
             var x = DateTime.UtcNow - lastActive;
 
@@ -47,9 +55,12 @@ namespace Agent.QueueHandlers
                 // Activate pump for <time> seconds.
                 // Note that each pump (ie, channel) might need a different time (longer hoses, different pump types etc)
                 var d = 1000;
-                Console.WriteLine($"@TODO: Activate pump {channel} - {d}ms");
+                Console.WriteLine($"Activate pump {channel} - {d}ms");
+                _gpio.Write(channel, PinValue.Low);
                 await Task.Delay(d);
-                Console.WriteLine($"@TODO: Deactivate pump {channel}!");
+
+                Console.WriteLine($"Deactivate pump {channel}!");
+                _gpio.Write(channel, PinValue.High);
 
                 _lastActivation[channel] = DateTime.UtcNow;
             }

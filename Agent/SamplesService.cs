@@ -27,13 +27,12 @@ namespace Agent
         {
             if (_sampleDefinitions != null)
             {
-                Console.WriteLine("Tick");
-
                 var due = _sampleDefinitions.Where(d => d.IsDue(DateTime.UtcNow));
+
+                Console.WriteLine($"Tick ({due.Count()} due)");
 
                 if (due.Any())
                 {
-                    Console.WriteLine($" - {due.Count()} due");
                     
                     var values = new List<DataPoint>();
 
@@ -61,11 +60,13 @@ namespace Agent
                             {
                                 sampleDefinition.LastSampleOn = DateTime.UtcNow;
 
-                                Console.Write($"{sampleDefinition.Name}: {sampleDefinition.LastValue} -> {val}");
+                                //Console.Write($"{sampleDefinition.Name}: {sampleDefinition.LastValue} -> {val}");
 
                                 if (sampleDefinition.CanUpdate(val.Value))
                                 {
-                                    Console.Write(" - updated");
+                                    Console.WriteLine($"{sampleDefinition.Name}: {sampleDefinition.LastValue} -> {val}");
+
+                                    //Console.Write(" - updated");
                                     sampleDefinition.LastValue = val;
                                     values.Add(new DataPoint() { 
                                         DataSourceId = sampleDefinition.DataSource.Id,
@@ -73,14 +74,12 @@ namespace Agent
                                         TimestampUtc = sampleDefinition.LastSampleOn.Value
                                     });
                                 }
-                                else
-                                {
-                                    Console.Write(" - no change");
-                                }
+                                //else
+                                //{
+                                //    Console.Write(" - no change");
+                                //}
 
-                                Console.WriteLine();
-
-                                
+                                //Console.WriteLine();                                
                             }
                         }
                         catch (Exception ex)
@@ -95,7 +94,7 @@ namespace Agent
 
                     if (values.Any())
                     {
-                        Console.WriteLine($"Posting {values.Count()} values");
+                        //Console.WriteLine($"Posting {values.Count()} values");
                         await API.PostDataAsync(values);
                     }
                 }

@@ -52,6 +52,8 @@ namespace TheSwamp.Shared
             {
                 string url = $"{_endpoint}/api/log/data";
                 var json = JsonConvert.SerializeObject(data);
+
+                //Console.WriteLine(url + "\n" + json);
                 using (var content = new StringContent(json, Encoding.UTF8, "application/json"))
                 {
                     var rs = await Client.PostAsync(url, content);

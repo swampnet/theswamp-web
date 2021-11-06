@@ -31,8 +31,12 @@ namespace Agent.Devices
 
                     if (_cpuTemp.IsAvailable)
                     {
-                        var temperature = _cpuTemp.ReadTemperatures();
-                        var x = temperature.SingleOrDefault(t => t.Sensor.EqualsNoCase(parts[1]));
+                        var temperatures = _cpuTemp.ReadTemperatures();
+
+                        Console.WriteLine("CPU Temperature\n" + string.Join("\n", temperatures.Select(t => $"[{t.Sensor}] {t.Temperature}")));
+                        Console.WriteLine($"Looking for: '{parts[1]}'");
+                        var x = temperatures.SingleOrDefault(t => t.Sensor.EqualsNoCase(parts[1]));
+
                         if (!double.IsNaN(x.Temperature.DegreesCelsius))
                         {
                             val = x.Temperature.DegreesCelsius;

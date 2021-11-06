@@ -48,7 +48,7 @@ namespace Integration
                         await EnqueueAsync(new AgentMessage() {
                             Type = "activate-pump",
                             Properties = new System.Collections.Generic.List<Property>() { 
-                                new Property("channel", "1")
+                                new Property("channel", "10")
                             }
                         });
                         break;
@@ -58,7 +58,7 @@ namespace Integration
                         {
                             Type = "activate-pump",
                             Properties = new System.Collections.Generic.List<Property>() {
-                                new Property("channel", "2")
+                                new Property("channel", "12")
                             }
                         });
                         break;

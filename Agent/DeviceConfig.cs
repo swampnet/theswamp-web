@@ -16,4 +16,11 @@ namespace Agent
         public string Type { get; set; }
         public Property[] Cfg { get; set; }
     }
+
+    public class PumpConfig
+    {
+        public TimeSpan Cooldown { get; set; }
+        public int Channel { get; set; }
+        public int SquirtSeconds { get; set; }
+    }
 }

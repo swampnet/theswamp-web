@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Device.Gpio;
 using System.Device.Spi;
+using System.Linq;
 using System.Threading.Tasks;
 using TheSwamp.Shared;
 
@@ -14,6 +15,8 @@ namespace Agent.QueueHandlers
         private readonly IConfiguration _cfg;
         private readonly Dictionary<int, DateTime> _lastActivation = new Dictionary<int, DateTime>();
         private GpioController _gpio;
+
+        private IEnumerable<PumpConfig> Pumps => _cfg.GetSection("pumps").Get<PumpConfig[]>();
 
         public ActivatePumpMessageHandler(IConfiguration cfg)
         {
@@ -33,41 +36,41 @@ namespace Agent.QueueHandlers
                 throw new ArgumentException("Missing channel");
             }
 
+            var pump = Pumps.SingleOrDefault(p=>p.Channel == channel);
+            if(pump == null)
+            {
+                throw new NullReferenceException($"Pump channel {channel} undefined");
+            }
+
             if(_gpio == null)
             {
                 _gpio = new GpioController(PinNumberingScheme.Board);
             }
 
             DateTime lastActive;
-            if(!_lastActivation.TryGetValue(channel, out lastActive))
+            if(!_lastActivation.TryGetValue(pump.Channel, out lastActive))
             {
                 lastActive = DateTime.MinValue;
-                _gpio.OpenPin(channel, PinMode.Output, PinValue.High);
+                _gpio.OpenPin(pump.Channel, PinMode.Output, PinValue.High);
             }
-
-            // @TODO: From cfg
-            var cooldown = TimeSpan.FromSeconds(10);
 
             var x = DateTime.UtcNow - lastActive;
 
-            if (x > cooldown)
+            if (x > pump.Cooldown)
             {
-                // Activate pump for <time> seconds.
-                // Note that each pump (ie, channel) might need a different time (longer hoses, different pump types etc)
-                var d = 1000;
-                Console.WriteLine($"Activate pump {channel} - {d}ms");
-                _gpio.Write(channel, PinValue.Low);
-                await Task.Delay(d);
+                Console.WriteLine($"Activate pump {pump.Channel} - {pump.SquirtSeconds}s");
+                _gpio.Write(pump.Channel, PinValue.Low);
+                await Task.Delay(pump.SquirtSeconds * 1000);
 
-                Console.WriteLine($"Deactivate pump {channel}!");
-                _gpio.Write(channel, PinValue.High);
+                Console.WriteLine($"Deactivate pump {pump.Channel}!");
+                _gpio.Write(pump.Channel, PinValue.High);
 
-                _lastActivation[channel] = DateTime.UtcNow;
+                _lastActivation[pump.Channel] = DateTime.UtcNow;
             }
             else
             {
-                Console.WriteLine($"Throttled pump {channel} (cooldown {cooldown-x})");
+                Console.WriteLine($"Throttled pump {pump.Channel} (cooldown {pump.Cooldown-x})");
             }
-        }
+        }        
     }
 }

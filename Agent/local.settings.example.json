@@ -1,14 +1,262 @@
 {
   "api": {
-    "endpoint": "http://localhost:7071",
-    "key": "<API-KEY>"
+    "endpoint": "<api endpoint>",
+    "key": "<api key>"
   },
-  "azure.servicebus": "<CONNECTION-STRING>",
+  "azure.servicebus": "<connection string>",
   "time-quotes": [
     "Ding dong, it's {{now}}",
     "Boomshakalaka, it's {{now}}",
     "Heeeyo, it's {{now}}",
     "It's chico time! Actually, no, it's {{now}}",
-    "Stop your grinnin' and drop your linen, it's {{now}}"
+    "Stop your grinnin' and drop your linen, it's {{now}}",
+    "Wubba Lubba Dub Dub, it's {{now}}!",
+    "It's {{now}} - Lets get schwifty!",
+    "Tick tok, it's {{now}}",
+    "It's {{now}}",
+    "What time is it? Showtime!    Also, it's {{now}}",
+    "Time is an illusion. It may or may not be {{now}}"
+  ],
+
+  "tick": 1000,
+
+  "devices": [
+    {
+      "name": "RandomNumbers",
+      "type": "RNG"
+    },
+    {
+      "name": "A2D",
+      "type": "A2D",
+      "cfg": [
+        {
+          "name": "chip-select",
+          "value": "1"
+        },
+        {
+          "name": "bus-id",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "name": "Cpu",
+      "type": "Cpu"
+    },
+    {
+      "name": "Hub",
+      "type": "Hub"
+    }
+  ],
+
+  "samples": [
+    {
+      "name": "Illuminance",
+      "device": "Hub",
+      "frequency": "00:15:00",
+      "minChange": 1.0,
+      "precision": 0,
+      "cfg": [
+        {
+          "name": "sensor",
+          "value": "ReadIlluminance"
+        }
+      ]
+    },
+    {
+      "name": "OffBoard temperature",
+      "device": "Hub",
+      "frequency": "00:15:00",
+      "minChange": 1.0,
+      "precision": 0,
+      "cfg": [
+        {
+          "name": "sensor",
+          "value": "OffBoardTemperature"
+        }
+      ]
+    },
+    {
+      "name": "Pressure",
+      "device": "Hub",
+      "frequency": "00:15:00",
+      "minChange": 1.0,
+      "precision": 0,
+      "cfg": [
+        {
+          "name": "sensor",
+          "value": "ReadBarometerPressure"
+        }
+      ]
+    },
+    {
+      "name": "Barometer temperature",
+      "device": "Hub",
+      "frequency": "00:15:00",
+      "minChange": 1.0,
+      "precision": 0,
+      "cfg": [
+        {
+          "name": "sensor",
+          "value": "ReadBarometerTemperature"
+        }
+      ]
+    },
+    {
+      "name": "OnBoard temperature",
+      "device": "Hub",
+      "frequency": "00:15:00",
+      "minChange": 1.0,
+      "precision": 0,
+      "cfg": [
+        {
+          "name": "sensor",
+          "value": "ReadOnBoardTemperature"
+        }
+      ]
+    },
+    {
+      "name": "Relative humidity",
+      "device": "Hub",
+      "frequency": "00:15:00",
+      "minChange": 1.0,
+      "precision": 0,
+      "cfg": [
+        {
+          "name": "sensor",
+          "value": "ReadRelativeHumidity"
+        }
+      ]
+    },
+    {
+      "name": "Motion",
+      "device": "Hub",
+      "frequency": "00:00:01",
+      "cfg": [
+        {
+          "name": "sensor",
+          "value": "MotionDetected"
+        }
+      ]
+    },
+
+
+    {
+      "name": "POT",
+      "device": "A2D",
+      "frequency": "00:00:01",
+      "minChange": 1.0,
+      "precision": 1,
+      "cfg": [
+        {
+          "name": "channel",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "name": "Moisture 01",
+      "device": "A2D",
+      "frequency": "00:15:00",
+      "minChange": 1.0,
+      "precision": 1,
+      "cfg": [
+        {
+          "name": "channel",
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "name": "Moisture 02",
+      "device": "A2D",
+      "frequency": "00:15:00",
+      "minChange": 1.0,
+      "precision": 1,
+      "cfg": [
+        {
+          "name": "channel",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "name": "Moisture 03",
+      "device": "A2D",
+      "frequency": "00:15:00",
+      "minChange": 1.0,
+      "precision": 1,
+      "cfg": [
+        {
+          "name": "channel",
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "name": "Moisture 04",
+      "device": "A2D",
+      "frequency": "00:15:00",
+      "minChange": 1.0,
+      "precision": 1,
+      "cfg": [
+        {
+          "name": "channel",
+          "value": "4"
+        }
+      ]
+    },
+
+    /*    {
+      "name": "temp:cpu",
+      "device": "Cpu",
+      "frequency": "00:00:30",
+      "minChange": 1.0,
+      "precision": 1,
+      "cfg": [
+        {
+          "name": "sensor",
+          "value": "temp:cpu"
+        }
+      ]      
+    },
+*/
+
+    {
+      "name": "test-01",
+      "device": "RandomNumbers",
+      "frequency": "00:10:00",
+      "cfg": [
+        {
+          "name": "min",
+          "value": "10"
+        },
+        {
+          "name": "max",
+          "value": "15"
+        },
+        {
+          "name": "int-values-only",
+          "value": "true"
+        }
+      ]
+    },
+    {
+      "name": "test-02",
+      "device": "RandomNumbers",
+      "frequency": "00:15:00",
+      "minChange": 10.0,
+      "precision": 1,
+      "cfg": [
+        {
+          "name": "min",
+          "value": "0"
+        },
+        {
+          "name": "max",
+          "value": "100"
+        }
+      ]
+    }
   ]
 }

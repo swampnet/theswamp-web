@@ -31,8 +31,9 @@ namespace Agent.QueueHandlers
         #region IQueueHandler
         public bool CanProcess(AgentMessage msg)
         {
-            return msg.Type.EqualsNoCase("led-message");
+            return msg.Type.EqualsNoCase("led-matrix");
         }
+
 
         public Task ProcessAsync(AgentMessage msg)
         {

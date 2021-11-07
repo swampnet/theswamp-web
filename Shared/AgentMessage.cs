@@ -22,21 +22,4 @@ namespace TheSwamp.Shared
         public string Type { get; set; }
         public List<Property> Properties { get; set; }
     }
-
-
-    public class Property : IProperty
-    {
-        public Property()
-        {
-        }
-
-        public Property(string name, string value)
-        {
-            Name = name;
-            Value = value;
-        }
-
-        public string Name { get; set; }
-        public string Value { get; set; }
-    }
 }

@@ -51,8 +51,10 @@ namespace TheSwamp.Shared
             if (data.Any())
             {
                 string url = $"{_endpoint}/api/log/data";
+                var json = JsonConvert.SerializeObject(data);
 
-                using (var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json"))
+                //Console.WriteLine(url + "\n" + json);
+                using (var content = new StringContent(json, Encoding.UTF8, "application/json"))
                 {
                     var rs = await Client.PostAsync(url, content);
                     rs.EnsureSuccessStatusCode();

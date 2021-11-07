@@ -30,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "media", "media", "{A16582D6
 	ProjectSection(SolutionItems) = preProject
 		media\20210926_135807.jpg = media\20210926_135807.jpg
 		media\20210926_142045.jpg = media\20210926_142045.jpg
+		media\20211107_152642.jpg = media\20211107_152642.jpg
+		media\20211107_153926.jpg = media\20211107_153926.jpg
 		media\pi-01_bb.png = media\pi-01_bb.png
 	EndProjectSection
 EndProject

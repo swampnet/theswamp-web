@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Azure.Messaging.ServiceBus;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Spectre.Console;
 using System;
 using System.Diagnostics;
@@ -9,11 +11,10 @@ using TheSwamp.Shared;
 
 namespace Integration
 {
-    internal class Program
+    internal static class Program
     {
         private static IConfiguration _cfg;
-        private static TheSwamp.Shared.Monitor _data = new TheSwamp.Shared.Monitor();
-
+        
         static async Task Main(string[] args)
         {
              _cfg = new ConfigurationBuilder()
@@ -23,7 +24,6 @@ namespace Integration
 
             API.Initialise(_cfg["api:endpoint"], _cfg["api:key"]);
 
-
             while (true)
             {
                 var cmd = AnsiConsole.Prompt(
@@ -31,41 +31,50 @@ namespace Integration
                             .Title("Select [green]option[/]?")
                             .MoreChoicesText("[grey](Move up and down)[/]")
                             .AddChoices(new[] { 
-                                "Get details", 
-                                "Flush", 
-                                "Start" }));
+                                "Get details",
+                                "Pump 1",
+                                "Pump 2"
+                            }));
 
                 switch (cmd)
                 {
-                    case "Start":
-                        var timer = new Timer(AddData, null, 0, 1000);
-                        AnsiConsole.WriteLine("start");
-                        break;
-
                     case "Get details":
                         AnsiConsole.WriteLine("getting device info");
                         var x = await API.GetDeviceAsync("test-01");
                         AnsiConsole.WriteLine(x.ToString());
                         break;
 
-                    case "Flush":
-                        AnsiConsole.WriteLine("Flushing");
-                        await _data.FlushAsync();
-                        AnsiConsole.WriteLine("flush complete");
+                    case "Pump 1":
+                        await EnqueueAsync(new AgentMessage() {
+                            Type = "activate-pump",
+                            Properties = new System.Collections.Generic.List<Property>() { 
+                                new Property("channel", "38")
+                            }
+                        });
                         break;
 
+                    case "Pump 2":
+                        await EnqueueAsync(new AgentMessage()
+                        {
+                            Type = "activate-pump",
+                            Properties = new System.Collections.Generic.List<Property>() {
+                                new Property("channel", "40")
+                            }
+                        });
+                        break;
                 }
             }
         }
 
-        private static Random _rng = new Random();
 
-        private static async void AddData(object state)
+        private static async Task EnqueueAsync(AgentMessage msg)
         {
-            var n = _rng.Next(1, 10);
-            Debug.WriteLine($"RNG rolled {n}");
-            await _data.AddDataPointAsync("test-01", n);
-            await _data.AddDataPointAsync("test-02", n);
+            await using (ServiceBusClient client = new ServiceBusClient(_cfg["azure.servicebus"]))
+            {
+                var sender = client.CreateSender("iot_agent");
+                var message = new ServiceBusMessage(JsonConvert.SerializeObject(msg));
+                await sender.SendMessageAsync(message);
+            }
         }
     }
 }

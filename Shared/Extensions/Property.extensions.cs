@@ -31,5 +31,20 @@ namespace TheSwamp.Shared
 
             return v;
         }
+
+        public static int IntValue(this IEnumerable<IProperty> source, string name, int defaultValue = 0)
+        {
+            return Convert.ToInt32(source.StringValue(name, defaultValue.ToString()));
+        }
+
+        public static double DoubleValue(this IEnumerable<IProperty> source, string name, double defaultValue = 0.0)
+        {
+            return Convert.ToDouble(source.StringValue(name, defaultValue.ToString()));
+        }
+
+        public static bool BooleanValue(this IEnumerable<IProperty> source, string name, bool defaultValue = false)
+        {
+            return Convert.ToBoolean(source.StringValue(name, defaultValue.ToString()));
+        }
     }
 }

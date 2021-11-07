@@ -79,8 +79,7 @@ namespace TheSwamp.Api.Services
                 x = new DAL.TRK.Entities.DataSource()
                 {
                     Name = deviceName,
-                    CreatedOnUtc = DateTime.UtcNow,
-                    UseAverage = false 
+                    CreatedOnUtc = DateTime.UtcNow
                 };
                 _trackingContext.DataSources.Add(x);
 
@@ -92,8 +91,6 @@ namespace TheSwamp.Api.Services
                 Id = x.Id,
                 Name = x.Name,
                 Description = x.Description,
-                UseAverage = x.UseAverage,
-                AveragePrecision = x.AveragePrecision,
                 CreatedOnUtc = x.CreatedOnUtc
             };
         }

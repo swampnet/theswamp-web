@@ -32,8 +32,10 @@ namespace Integration
                             .MoreChoicesText("[grey](Move up and down)[/]")
                             .AddChoices(new[] { 
                                 "Get details",
-                                "Pump 1",
-                                "Pump 2"
+                                "Pump 1 (38)",
+                                "Pump 2 (40)",
+                                "Pump 3 (36)",
+                                "Pump 4 (32)"
                             }));
 
                 switch (cmd)
@@ -44,7 +46,7 @@ namespace Integration
                         AnsiConsole.WriteLine(x.ToString());
                         break;
 
-                    case "Pump 1":
+                    case "Pump 1 (38)":
                         await EnqueueAsync(new AgentMessage() {
                             Type = "activate-pump",
                             Properties = new System.Collections.Generic.List<Property>() { 
@@ -53,12 +55,32 @@ namespace Integration
                         });
                         break;
 
-                    case "Pump 2":
+                    case "Pump 2 (40)":
                         await EnqueueAsync(new AgentMessage()
                         {
                             Type = "activate-pump",
                             Properties = new System.Collections.Generic.List<Property>() {
                                 new Property("channel", "40")
+                            }
+                        });
+                        break;
+
+                    case "Pump 3 (36)":
+                        await EnqueueAsync(new AgentMessage()
+                        {
+                            Type = "activate-pump",
+                            Properties = new System.Collections.Generic.List<Property>() {
+                                new Property("channel", "36")
+                            }
+                        });
+                        break;
+
+                    case "Pump 4 (32)":
+                        await EnqueueAsync(new AgentMessage()
+                        {
+                            Type = "activate-pump",
+                            Properties = new System.Collections.Generic.List<Property>() {
+                                new Property("channel", "32")
                             }
                         });
                         break;

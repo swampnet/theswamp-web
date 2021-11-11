@@ -6,8 +6,8 @@ A [Blazor WebAssembly](https://docs.microsoft.com/aspnet/core/blazor/?view=aspne
 
 Here's what the backend looks like as of 07/Nov/2021, It's a Raspberry PI 4B, with a Sensor Hub HAT plugged into a breadboard.
 
-![28 OCT 2021](media/20211107_152642.jpg)
-![28 OCT 2021](media/20211107_153926.jpg)
+![28 OCT 2021](media/20211111_111031.jpg)
+![28 OCT 2021](media/20211111_110810.jpg)
 
 
 ### Sensor Hub 

@@ -50,6 +50,7 @@ namespace TheSwamp.Shared
         {
             if (data.Any())
             {
+                Console.WriteLine($"Posting {data.Count()} values");
                 string url = $"{_endpoint}/api/log/data";
                 var json = JsonConvert.SerializeObject(data);
 

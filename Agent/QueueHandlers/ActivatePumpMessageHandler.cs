@@ -58,9 +58,9 @@ namespace Agent.QueueHandlers
 
             if (x > pump.Cooldown)
             {
-                Console.WriteLine($"Activate pump {pump.Channel} - {pump.SquirtSeconds}s");
+                Console.WriteLine($"Activate pump {pump.Channel} - {pump.SquirtSeconds:0.0}s");
                 _gpio.Write(pump.Channel, PinValue.Low);
-                await Task.Delay(pump.SquirtSeconds * 1000);
+                await Task.Delay((int)(pump.SquirtSeconds * 1000.0));
 
                 Console.WriteLine($"Deactivate pump {pump.Channel}!");
                 _gpio.Write(pump.Channel, PinValue.High);

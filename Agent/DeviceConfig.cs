@@ -21,6 +21,6 @@ namespace Agent
     {
         public TimeSpan Cooldown { get; set; }
         public int Channel { get; set; }
-        public int SquirtSeconds { get; set; }
+        public double SquirtSeconds { get; set; }
     }
 }

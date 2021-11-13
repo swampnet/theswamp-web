@@ -12,7 +12,15 @@
 else
 {
     <h1>@_dataSource.Name</h1>
+
+    @if (_dataSource.Values.Any())
+    {
+        var latest = _dataSource.Values.OrderByDescending(v => v.TimestampUtc).First();
+        <span><strong>@latest.Value</strong> (@latest.TimestampUtc.ToLocalTime().ToString("dd MMM HH:mm"))</span>
+    }
+
     <PlotlyChart @bind-Config="_config" @bind-Layout="_layout" @bind-Data="_data" @ref="_chart" />
+    
     <div class="events">
         @foreach(var e in _dataSource.Events)
         {

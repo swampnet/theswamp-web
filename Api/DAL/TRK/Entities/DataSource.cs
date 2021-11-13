@@ -14,6 +14,7 @@ namespace TheSwamp.Api.DAL.TRK.Entities
 
         public ICollection<DataPoint> Values { get; set; }
         public ICollection<DataSourceEvent> Events { get; set; }
+        public ICollection<DataSourceProcessor> Processors { get; set; }
     }
 
     public class DataPoint : Shared.DataPoint
@@ -22,9 +23,34 @@ namespace TheSwamp.Api.DAL.TRK.Entities
         public DataSource Source { get; set; }
     }
 
+
     public class DataSourceEvent : Shared.DataSourceEvent
     {
         public long Id { get; set; }
         public DataSource Source { get; set; }
+    }
+
+
+    public class DataSourceProcessor
+    {
+        public int Id { get; set; }
+        public int DataSourceId { get; set; }
+        public DataSource DataSource { get; set; }
+
+        public string Name { get; set; }
+        public bool IsActive { get; set; }
+
+        public ICollection<DataSourceProcessorParameter> Parameters { get; set; }
+    }
+
+
+    public class DataSourceProcessorParameter : Shared.IProperty
+    {
+        public int Id { get; set; }
+        public int DataSourceProcessorId { get; set; }
+        public DataSourceProcessor Processor { get; set; }
+
+        public string Name { get; set; }
+        public string Value { get; set; }
     }
 }

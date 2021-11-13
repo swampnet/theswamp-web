@@ -32,7 +32,8 @@ namespace TheSwamp.Api
             builder.Services.AddTransient<IAuth, Auth>();
             builder.Services.AddTransient<IPostMessage, PostMessageService>();
 
-            builder.Services.AddTransient<IDataPointProcessor, RandomNumberProcessor>();
+            builder.Services.AddTransient<IDataPointProcessor, RaiseEventOnValue>();
+            builder.Services.AddTransient<IDataPointProcessor, SquirtyBoi>();
 
             builder.Services.AddDbContext<TrackingContext>(options =>
                 options.UseSqlServer(cfg["connectionstring.swampnet"])

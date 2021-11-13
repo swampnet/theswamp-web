@@ -14,11 +14,13 @@ namespace TheSwamp.Api.Services
     internal class DataLoggerService : IDataLogger
     {
         private readonly TrackingContext _trackingContext;
+        private readonly IPostMessage _postMessage;
         private readonly IEnumerable<IDataPointProcessor> _dataPointProcessors;
 
-        public DataLoggerService(TrackingContext trackingContext, IEnumerable<IDataPointProcessor> dataPointProcessors)
+        public DataLoggerService(TrackingContext trackingContext, IPostMessage postMessage, IEnumerable<IDataPointProcessor> dataPointProcessors)
         {
             _trackingContext = trackingContext;
+            _postMessage = postMessage;
             _dataPointProcessors = dataPointProcessors;
         }
 
@@ -116,8 +118,12 @@ namespace TheSwamp.Api.Services
         {
             foreach(var grpd in deviceValues.GroupBy(d => d.DataSourceId))
             {
-                var device = await _trackingContext.DataSources.SingleOrDefaultAsync(d => d.Id == grpd.Key);
-                if(device != null)
+                var dataSource = await _trackingContext.DataSources
+                    .Include(f=>f.Processors)
+                        .ThenInclude(f=>f.Parameters)
+                    .SingleOrDefaultAsync(d => d.Id == grpd.Key);
+
+                if(dataSource != null)
                 {
                     var values = grpd
                         .Select(d =>
@@ -128,15 +134,45 @@ namespace TheSwamp.Api.Services
                             })
                         .ToList();
 
-                    device.Values = values;
+                    dataSource.Values = values;
 
                     try
                     {
-                        foreach (var p in _dataPointProcessors)
+                        foreach(var p in dataSource.Processors.Where(p => p.IsActive))
                         {
+                            var processor = _dataPointProcessors.SingleOrDefault(x => x.Name.EqualsNoCase(p.Name));
+                            if(processor == null)
+                            {
+                                throw new NullReferenceException($"Processor '{p.Name}' not registered");
+                            }
+
                             foreach(var val in values)
                             {
-                                await p.ProcessAsync(device, val);
+                                var rs = await processor.ProcessAsync(p, val);
+                                if (!string.IsNullOrEmpty(rs.Summary))
+                                {
+                                    dataSource.Events.Add(new DAL.TRK.Entities.DataSourceEvent()
+                                    {
+                                        TimestampUtc = val.TimestampUtc,
+                                        Description = rs.Summary
+                                    });
+
+                                    if (rs.Broadcast)
+                                    {
+                                        await _postMessage.PostAsync(new AgentMessage()
+                                        {
+                                            Type = "led-matrix",
+                                            Properties = new List<Property>()
+                                            {
+                                                new Property()
+                                                {
+                                                    Name = "content",
+                                                    Value = rs.Summary
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
                             }
                         }
                     }
@@ -146,9 +182,10 @@ namespace TheSwamp.Api.Services
                     }
 
                     await _trackingContext.SaveChangesAsync();
-
                 }
             }
         }
     }
+
+
 }

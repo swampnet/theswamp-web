@@ -19,6 +19,7 @@ namespace TheSwamp.Api.Interfaces
 
     public interface IDataPointProcessor
     {
-        Task ProcessAsync(DAL.TRK.Entities.DataSource source, DAL.TRK.Entities.DataPoint pt);
+        string Name { get; }
+        Task<ProcessDataSourceResult> ProcessAsync(DAL.TRK.Entities.DataSourceProcessor source, DAL.TRK.Entities.DataPoint pt);
     }
 }

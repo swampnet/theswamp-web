@@ -26,6 +26,8 @@ namespace TheSwamp.Api.DAL.TRK
             modelBuilder.Entity<DataSource>().ToTable("DataSource");
             modelBuilder.Entity<DataSourceEvent>().ToTable("DataSourceEvent");
             modelBuilder.Entity<DataPoint>().ToTable("DataPoint");
+            modelBuilder.Entity<DataSourceProcessor>().ToTable("DataSourceProcessor");
+            modelBuilder.Entity<DataSourceProcessorParameter>().ToTable("DataSourceProcessorParameter");
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -6,7 +6,7 @@ using TheSwamp.Shared;
 
 namespace TheSwamp.Api.Interfaces
 {
-    public interface IMonitor
+    public interface IDataLogger
     {
         public Task<DataSourceSummary[]> GetDataSourceSummaryAsync();
         public Task<DataSource[]> GetDevicesAsync();
@@ -14,5 +14,11 @@ namespace TheSwamp.Api.Interfaces
         Task<DataSource> GetDeviceAsync(string deviceName);
         Task PostValuesAsync(DataPoint[] deviceValues);
         Task<DataSourceSummary> GetHistory(string device);
+    }
+
+
+    public interface IDataPointProcessor
+    {
+        Task ProcessAsync(DAL.TRK.Entities.DataSource source, DAL.TRK.Entities.DataPoint pt);
     }
 }

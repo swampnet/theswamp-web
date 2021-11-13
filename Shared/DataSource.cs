@@ -15,22 +15,17 @@ namespace TheSwamp.Shared
         public int UpdateCount { get; set; }
 
         public DataPoint[] Values { get; set; }
+        public DataSourceEvent[] Events { get; set; }
     }
 
 
 
     public class DataSource
     {
-        [JsonPropertyName("s")]
-        [JsonProperty("s")]
         public int Id { get; set; }
 
-        [JsonPropertyName("n")]
-        [JsonProperty("n")]
         public string Name { get; set; }
 
-        [JsonPropertyName("d")]
-        [JsonProperty("d")]
         public string Description { get; set; }
         
         public DateTime CreatedOnUtc { get; set; }

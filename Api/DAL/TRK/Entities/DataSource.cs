@@ -6,6 +6,12 @@ namespace TheSwamp.Api.DAL.TRK.Entities
 {
     public class DataSource : Shared.DataSource
     {
+        public DataSource()
+        {
+            Values = new List<DataPoint>();
+            Events = new List<DataSourceEvent>();
+        }
+
         public ICollection<DataPoint> Values { get; set; }
         public ICollection<DataSourceEvent> Events { get; set; }
     }

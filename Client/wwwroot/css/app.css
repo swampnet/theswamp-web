@@ -230,3 +230,10 @@ app {
         font-weight: normal;
         font-size: x-small;
     }
+
+.events{
+    display: grid;
+    grid-auto-columns: auto auto;
+
+    font-size: x-small;
+}

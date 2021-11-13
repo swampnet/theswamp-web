@@ -11,13 +11,15 @@ using TheSwamp.Shared;
 
 namespace TheSwamp.Api.Services
 {
-    internal class MonitorService : IMonitor
+    internal class DataLoggerService : IDataLogger
     {
         private readonly TrackingContext _trackingContext;
+        private readonly IEnumerable<IDataPointProcessor> _dataPointProcessors;
 
-        public MonitorService(TrackingContext trackingContext)
+        public DataLoggerService(TrackingContext trackingContext, IEnumerable<IDataPointProcessor> dataPointProcessors)
         {
             _trackingContext = trackingContext;
+            _dataPointProcessors = dataPointProcessors;
         }
 
         public Task<DataSourceSummary> GetHistory(string device)
@@ -32,7 +34,8 @@ namespace TheSwamp.Api.Services
                     LastUpdateOnUtc = x.Values.OrderByDescending(v => v.TimestampUtc).FirstOrDefault().TimestampUtc,
                     LastValue = x.Values.OrderByDescending(v => v.TimestampUtc).FirstOrDefault().Value,
                     UpdateCount = x.Values.Count(),
-                    Values = x.Values.ToArray()
+                    Values = x.Values.ToArray(),
+                    Events = x.Events.ToArray()
                 })
                 .SingleOrDefaultAsync(x => x.Name == device);
         }
@@ -116,15 +119,34 @@ namespace TheSwamp.Api.Services
                 var device = await _trackingContext.DataSources.SingleOrDefaultAsync(d => d.Id == grpd.Key);
                 if(device != null)
                 {
-                    device.Values = grpd
-                        .Select(d => 
-                            new DAL.TRK.Entities.DataPoint() { 
+                    var values = grpd
+                        .Select(d =>
+                            new DAL.TRK.Entities.DataPoint()
+                            {
                                 TimestampUtc = d.TimestampUtc,
                                 Value = d.Value
                             })
                         .ToList();
 
+                    device.Values = values;
+
+                    try
+                    {
+                        foreach (var p in _dataPointProcessors)
+                        {
+                            foreach(var val in values)
+                            {
+                                await p.ProcessAsync(device, val);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //log & ignore
+                    }
+
                     await _trackingContext.SaveChangesAsync();
+
                 }
             }
         }

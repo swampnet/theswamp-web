@@ -7,6 +7,7 @@ using TheSwamp.Api.DAL.IOT;
 using TheSwamp.Api.DAL.TRK;
 using TheSwamp.Api.Interfaces;
 using TheSwamp.Api.Services;
+using TheSwamp.Api.Services.DataPointProcessors;
 
 [assembly: FunctionsStartup(typeof(TheSwamp.Api.Startup))]
 namespace TheSwamp.Api
@@ -27,10 +28,11 @@ namespace TheSwamp.Api
 
             builder.Services.AddHttpClient();
 
-            builder.Services.AddTransient<IMonitor, MonitorService>();
+            builder.Services.AddTransient<IDataLogger, DataLoggerService>();
             builder.Services.AddTransient<IAuth, Auth>();
             builder.Services.AddTransient<IPostMessage, PostMessageService>();
 
+            builder.Services.AddTransient<IDataPointProcessor, RandomNumberProcessor>();
 
             builder.Services.AddDbContext<TrackingContext>(options =>
                 options.UseSqlServer(cfg["connectionstring.swampnet"])

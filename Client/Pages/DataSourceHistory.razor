@@ -13,6 +13,12 @@ else
 {
     <h1>@_dataSource.Name</h1>
     <PlotlyChart @bind-Config="_config" @bind-Layout="_layout" @bind-Data="_data" @ref="_chart" />
+    <div class="events">
+        @foreach(var e in _dataSource.Events)
+        {
+            <div>@e.TimestampUtc @e.Description</div>
+        }
+    </div>
 }
 
 @code {
@@ -24,7 +30,7 @@ else
     private Layout _layout;
     private PlotlyChart _chart;
     private Config _config = new Config();
-    
+
     protected override async Task OnInitializedAsync()
     {
         _dataSource = await Http.GetFromJsonAsync<DataSourceSummary>($"/api/log/data/" + Device);
@@ -54,11 +60,25 @@ else
         {
             new Scatter
             {
-                Name = "ScatterTrace",
+                Name = "Values",
                 Mode = ModeFlag.Lines | ModeFlag.Markers,
                 X = _dataSource.Values.OrderBy(x => x.TimestampUtc).Select(x => (object)x.TimestampUtc.ToLocalTime()).ToList(),
                 Y = _dataSource.Values.OrderBy(x => x.TimestampUtc).Select(x => (object)Convert.ToDouble(x.Value)).ToList()
             }
         };
+
+        // Add in event data if we have any
+        // Probably a better way to do this, just adding as a noddy bar chart for now...
+        // ^ Probably shapes? (https://plotly-blazor.azurewebsites.net/shapes)
+        if (_dataSource.Events.Any())
+        {
+            _data.Add(
+                new Bar
+                {
+                    Name = "Events",
+                    X = _dataSource.Events.OrderBy(x => x.TimestampUtc).Select(x => (object)x.TimestampUtc.ToLocalTime()).ToList(),
+                    Y = _dataSource.Events.OrderBy(x => x.TimestampUtc).Select(x => (object)1).ToList()
+                });
+        }
     }
 }

@@ -11,6 +11,8 @@ namespace TheSwamp.Api.DAL.TRK
     {
         public DbSet<DataSource> DataSources { get; set; }
         public DbSet<DataPoint> DataPoints { get; set; }
+        public DbSet<DataSourceEvent> Events { get; set; }
+
 
         public TrackingContext(DbContextOptions<TrackingContext> options)
             : base(options)
@@ -22,6 +24,7 @@ namespace TheSwamp.Api.DAL.TRK
             modelBuilder.HasDefaultSchema("trk");
 
             modelBuilder.Entity<DataSource>().ToTable("DataSource");
+            modelBuilder.Entity<DataSourceEvent>().ToTable("DataSourceEvent");
             modelBuilder.Entity<DataPoint>().ToTable("DataPoint");
             base.OnModelCreating(modelBuilder);
         }

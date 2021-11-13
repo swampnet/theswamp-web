@@ -21,12 +21,19 @@ namespace TheSwamp.Shared
 
     public class DataSource
     {
+        [JsonPropertyName("s")]
+        [JsonProperty("s")]
         public int Id { get; set; }
+
+        [JsonPropertyName("n")]
+        [JsonProperty("n")]
         public string Name { get; set; }
+
+        [JsonPropertyName("d")]
+        [JsonProperty("d")]
         public string Description { get; set; }
+        
         public DateTime CreatedOnUtc { get; set; }
-        //public bool UseAverage { get; set; }
-        //public int? AveragePrecision { get; set; }
         public string Units { get; set; }
 
         public override string ToString()
@@ -51,5 +58,20 @@ namespace TheSwamp.Shared
         [JsonPropertyName("v")]
         [JsonProperty("v")]
         public string Value { get; set; }
+    }
+
+    public class DataSourceEvent
+    {        
+        [JsonPropertyName("s")]
+        [JsonProperty("s")]
+        public int DataSourceId { get; set; }
+        
+        [JsonPropertyName("t")]
+        [JsonProperty("t")]
+        public DateTime TimestampUtc { get; set; }
+        
+        [JsonPropertyName("d")]
+        [JsonProperty("d")]
+        public string Description { get; set; }
     }
 }

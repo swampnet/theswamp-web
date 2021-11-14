@@ -24,6 +24,7 @@ namespace TheSwamp.Api.DAL.TRK
             modelBuilder.HasDefaultSchema("trk");
 
             modelBuilder.Entity<DataSource>().ToTable("DataSource");
+            modelBuilder.Entity<DataSource>().Property(f => f.MaxHistory).HasConversion<TimeSpan>();
             modelBuilder.Entity<DataSourceEvent>().ToTable("DataSourceEvent");
             modelBuilder.Entity<DataPoint>().ToTable("DataPoint");
             modelBuilder.Entity<DataSourceProcessor>().ToTable("DataSourceProcessor");

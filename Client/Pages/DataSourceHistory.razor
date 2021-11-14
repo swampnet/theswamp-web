@@ -22,9 +22,10 @@ else
     <PlotlyChart @bind-Config="_config" @bind-Layout="_layout" @bind-Data="_data" @ref="_chart" />
     
     <div class="events">
+        <h4>Events</h4>
         @foreach(var e in _dataSource.Events)
         {
-            <div>@e.TimestampUtc @e.Description</div>
+            <div><strong>@e.TimestampUtc.ToLocalTime().ToString("HH\\:mm\\:ss dd MMM yy")</strong> @e.Description</div>
         }
     </div>
 }
@@ -78,18 +79,15 @@ else
         // Add in event data if we have any
         if (_dataSource.Events.Any())
         {
-            // Stick in middle
-            //var y = _dataSource.Values.Average(x => Convert.ToDouble(x.Value));
-
-            // Stick at top ( max y plus a bit )
-            var y = _dataSource.Values.Max(x => Convert.ToDouble(x.Value)) * 1.1;
+            var maxY = _dataSource.Values.Max(x => Convert.ToDouble(x.Value));
+            var scaleY = 1.08;
 
             _data.Add(
                 new Scatter()
                 {
                     Name = "Event",
                     X = _dataSource.Events.OrderBy(x => x.TimestampUtc).Select(x => (object)x.TimestampUtc.ToLocalTime()).ToList(),
-                    Y = _dataSource.Events.OrderBy(x => x.TimestampUtc).Select(x => (object)x.DataPoint.Value).ToList(),
+                    Y = _dataSource.Events.OrderBy(x => x.TimestampUtc).Select(x => (object)(x.DataPoint != null ? (Convert.ToDouble(x.DataPoint.Value) * scaleY) : (maxY * scaleY))).ToList(),
                     TextArray = _dataSource.Events.OrderBy(x => x.TimestampUtc).Select(x => x.Description).ToList(),
                     Mode = ModeFlag.Text
                 }

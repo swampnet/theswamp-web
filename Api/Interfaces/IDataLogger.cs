@@ -10,7 +10,7 @@ namespace TheSwamp.Api.Interfaces
     {
         public Task<DataSourceSummary[]> GetDataSourceSummaryAsync();
         public Task<DataSource[]> GetDevicesAsync();
-        Task<DataPoint[]> GetValuesAsync(int deviceId);
+        //Task<DataPoint[]> GetValuesAsync(int deviceId);
         Task<DataSource> GetDeviceAsync(string deviceName);
         Task PostValuesAsync(DataPoint[] deviceValues);
         Task<DataSourceSummary> GetHistory(string device);

@@ -24,9 +24,12 @@ namespace TheSwamp.Api.Services
             _dataPointProcessors = dataPointProcessors;
         }
 
-        public Task<DataSourceSummary> GetHistory(string device)
+        public async Task<DataSourceSummary> GetHistory(string device)
         {
-            return _trackingContext.DataSources
+            //var ds = await _trackingContext.DataSources.SingleAsync(x => x.Name == device);
+            //var dt = DateTime.UtcNow.Subtract(ds.MaxHistory);
+
+            return await _trackingContext.DataSources
                 .Select(x => new DataSourceSummary()
                 {
                     Id = x.Id,
@@ -109,18 +112,21 @@ namespace TheSwamp.Api.Services
             };
         }
 
-        public async Task<DataPoint[]> GetValuesAsync (int deviceId)
-        {
-            var x = await _trackingContext.DataPoints
-                .Where(dv => dv.DataSourceId == deviceId)
-                .ToArrayAsync();
+        //public async Task<DataPoint[]> GetValuesAsync (int deviceId)
+        //{
+        //    var ds = await _trackingContext.DataSources.SingleAsync(x => x.Id == deviceId);
+        //    var dt = DateTime.UtcNow.Subtract(ds.MaxHistory);
 
-            return x.Select(y => new DataPoint()
-            {
-                TimestampUtc = y.TimestampUtc,
-                Value = y.Value
-            }).ToArray();
-        }
+        //    var x = await _trackingContext.DataPoints
+        //        .Where(dv => dv.DataSourceId == deviceId && dv.TimestampUtc > dt)
+        //        .ToArrayAsync();
+
+        //    return x.Select(y => new DataPoint()
+        //    {
+        //        TimestampUtc = y.TimestampUtc,
+        //        Value = y.Value
+        //    }).ToArray();
+        //}
 
 
         public async Task PostValuesAsync(DataPoint[] deviceValues)

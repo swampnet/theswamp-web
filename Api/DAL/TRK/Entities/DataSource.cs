@@ -38,7 +38,7 @@ namespace TheSwamp.Api.DAL.TRK.Entities
 
         public string Description { get; set; }
 
-        public long DataPointId { get; set; }
+        public long? DataPointId { get; set; }
         public DataPoint DataPoint { get; set; }
     }
 

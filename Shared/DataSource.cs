@@ -15,7 +15,7 @@ namespace TheSwamp.Shared
         public int UpdateCount { get; set; }
 
         public DataPoint[] Values { get; set; }
-        public DataSourceEvent[] Events { get; set; }
+        public DataSourceEventSummary[] Events { get; set; }
     }
 
 
@@ -55,7 +55,7 @@ namespace TheSwamp.Shared
         public string Value { get; set; }
     }
 
-    public class DataSourceEvent
+    public class DataSourceEventSummary
     {        
         [JsonPropertyName("s")]
         [JsonProperty("s")]
@@ -68,5 +68,6 @@ namespace TheSwamp.Shared
         [JsonPropertyName("d")]
         [JsonProperty("d")]
         public string Description { get; set; }
+        public DataPoint DataPoint { get; set; }
     }
 }

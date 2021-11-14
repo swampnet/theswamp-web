@@ -76,17 +76,24 @@ else
         };
 
         // Add in event data if we have any
-        // Probably a better way to do this, just adding as a noddy bar chart for now...
-        // ^ Probably shapes? (https://plotly-blazor.azurewebsites.net/shapes)
         if (_dataSource.Events.Any())
         {
+            // Stick in middle
+            //var y = _dataSource.Values.Average(x => Convert.ToDouble(x.Value));
+
+            // Stick at top ( max y plus a bit )
+            var y = _dataSource.Values.Max(x => Convert.ToDouble(x.Value)) * 1.1;
+
             _data.Add(
-                new Bar
+                new Scatter()
                 {
-                    Name = "Events",
+                    Name = "Event",
                     X = _dataSource.Events.OrderBy(x => x.TimestampUtc).Select(x => (object)x.TimestampUtc.ToLocalTime()).ToList(),
-                    Y = _dataSource.Events.OrderBy(x => x.TimestampUtc).Select(x => (object)1).ToList()
-                });
+                    Y = _dataSource.Events.OrderBy(x => x.TimestampUtc).Select(x => (object)x.DataPoint.Value).ToList(),
+                    TextArray = _dataSource.Events.OrderBy(x => x.TimestampUtc).Select(x => x.Description).ToList(),
+                    Mode = ModeFlag.Text
+                }
+            );
         }
     }
 }

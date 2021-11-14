@@ -21,13 +21,25 @@ namespace TheSwamp.Api.DAL.TRK.Entities
     {
         public long Id { get; set; }
         public DataSource Source { get; set; }
+
+        public ICollection<DataSourceEvent> Events { get; set; }
     }
 
 
-    public class DataSourceEvent : Shared.DataSourceEvent
+    public class DataSourceEvent
     {
+
         public long Id { get; set; }
+
+        public int DataSourceId { get; set; }
         public DataSource Source { get; set; }
+
+        public DateTime TimestampUtc { get; set; }
+
+        public string Description { get; set; }
+
+        public long DataPointId { get; set; }
+        public DataPoint DataPoint { get; set; }
     }
 
 

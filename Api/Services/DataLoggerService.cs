@@ -37,7 +37,16 @@ namespace TheSwamp.Api.Services
                     LastValue = x.Values.OrderByDescending(v => v.TimestampUtc).FirstOrDefault().Value,
                     UpdateCount = x.Values.Count(),
                     Values = x.Values.ToArray(),
-                    Events = x.Events.ToArray()
+                    Events = x.Events.Select(e => new DataSourceEventSummary() {
+                        DataSourceId = e.DataSourceId,
+                        Description = e.Description,
+                        TimestampUtc = e.TimestampUtc,
+                        DataPoint = new DataPoint() {
+                            DataSourceId = e.DataSourceId,
+                            TimestampUtc = e.DataPoint.TimestampUtc,
+                            Value = e.DataPoint.Value
+                        }
+                    }).ToArray()
                 })
                 .SingleOrDefaultAsync(x => x.Name == device);
         }
@@ -154,7 +163,8 @@ namespace TheSwamp.Api.Services
                                     dataSource.Events.Add(new DAL.TRK.Entities.DataSourceEvent()
                                     {
                                         TimestampUtc = val.TimestampUtc,
-                                        Description = rs.Summary
+                                        Description = rs.Summary,
+                                        DataPoint = val
                                     });
 
                                     if (rs.Broadcast)

@@ -109,22 +109,6 @@ namespace TheSwamp.Api.Services
             };
         }
 
-        //public async Task<DataPoint[]> GetValuesAsync (int deviceId)
-        //{
-        //    var ds = await _trackingContext.DataSources.SingleAsync(x => x.Id == deviceId);
-        //    var dt = DateTime.UtcNow.Subtract(ds.MaxHistory);
-
-        //    var x = await _trackingContext.DataPoints
-        //        .Where(dv => dv.DataSourceId == deviceId && dv.TimestampUtc > dt)
-        //        .ToArrayAsync();
-
-        //    return x.Select(y => new DataPoint()
-        //    {
-        //        TimestampUtc = y.TimestampUtc,
-        //        Value = y.Value
-        //    }).ToArray();
-        //}
-
 
         public async Task PostValuesAsync(DataPoint[] deviceValues)
         {
@@ -170,21 +154,21 @@ namespace TheSwamp.Api.Services
                                         DataPoint = val
                                     });
 
-                                    if (rs.Broadcast)
-                                    {
-                                        await _postMessage.PostAsync(new AgentMessage()
-                                        {
-                                            Type = "led-matrix",
-                                            Properties = new List<Property>()
-                                            {
-                                                new Property()
-                                                {
-                                                    Name = "content",
-                                                    Value = rs.Summary
-                                                }
-                                            }
-                                        });
-                                    }
+                                    //if (rs.Broadcast)
+                                    //{
+                                    //    await _postMessage.PostAsync(new AgentMessage()
+                                    //    {
+                                    //        Type = "led-matrix",
+                                    //        Properties = new List<Property>()
+                                    //        {
+                                    //            new Property()
+                                    //            {
+                                    //                Name = "content",
+                                    //                Value = rs.Summary
+                                    //            }
+                                    //        }
+                                    //    });
+                                    //}
                                 }
                             }
                         }

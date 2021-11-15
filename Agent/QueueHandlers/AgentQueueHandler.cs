@@ -24,7 +24,10 @@ namespace Agent
         public async Task StartAsync()
         {
             var servicebus = new ServiceBusClient(_cfg["azure.servicebus"]);
-            var servicebusProcessor = servicebus.CreateProcessor("iot_agent");
+            var servicebusProcessor = servicebus.CreateProcessor("iot_agent", new ServiceBusProcessorOptions() { 
+                PrefetchCount = 0,
+                MaxConcurrentCalls = 1                
+            });
             servicebusProcessor.ProcessMessageAsync += ProcessMessageAsync;
             servicebusProcessor.ProcessErrorAsync += ProcessErrorAsync;
             await servicebusProcessor.StartProcessingAsync();

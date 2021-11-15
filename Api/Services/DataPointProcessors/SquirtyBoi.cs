@@ -38,7 +38,7 @@ namespace TheSwamp.Api.Services.DataPointProcessors
                     }
                 });
 
-                rs.Summary = $"{source.DataSource.Name} ({source.DataSource.Description}) value: {val:0.0} / {threshold:0.0} - Activate pump {channel}";
+                rs.Summary = $"{source.DataSource.Name} ({source.DataSource.Description}) - Activating pump {channel}";
                 rs.Broadcast = true;
             }
 

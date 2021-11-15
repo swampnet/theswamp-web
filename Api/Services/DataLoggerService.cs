@@ -154,21 +154,21 @@ namespace TheSwamp.Api.Services
                                         DataPoint = val
                                     });
 
-                                    //if (rs.Broadcast)
-                                    //{
-                                    //    await _postMessage.PostAsync(new AgentMessage()
-                                    //    {
-                                    //        Type = "led-matrix",
-                                    //        Properties = new List<Property>()
-                                    //        {
-                                    //            new Property()
-                                    //            {
-                                    //                Name = "content",
-                                    //                Value = rs.Summary
-                                    //            }
-                                    //        }
-                                    //    });
-                                    //}
+                                    if (rs.Broadcast)
+                                    {
+                                        await _postMessage.PostAsync(new AgentMessage()
+                                        {
+                                            Type = "led-matrix",
+                                            Properties = new List<Property>()
+                                            {
+                                                new Property()
+                                                {
+                                                    Name = "content",
+                                                    Value = rs.Summary
+                                                }
+                                            }
+                                        });
+                                    }
                                 }
                             }
                         }

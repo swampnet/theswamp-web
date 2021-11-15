@@ -26,9 +26,6 @@ namespace TheSwamp.Api.Services
 
         public async Task<DataSourceSummary> GetHistory(string device)
         {
-            //var ds = await _trackingContext.DataSources.SingleAsync(x => x.Name == device);
-            //var dt = DateTime.UtcNow.Subtract(ds.MaxHistory);
-
             return await _trackingContext.DataSources
                 .Select(x => new DataSourceSummary()
                 {

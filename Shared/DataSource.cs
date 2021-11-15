@@ -31,8 +31,6 @@ namespace TheSwamp.Shared
         public DateTime CreatedOnUtc { get; set; }
         public string Units { get; set; }
 
-        public TimeSpan MaxHistory { get; set; }
-
         public override string ToString()
         {
             return $"[{Id}] {Name}";

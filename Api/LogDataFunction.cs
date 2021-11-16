@@ -62,7 +62,7 @@ namespace TheSwamp.Api
 
 
         [FunctionName("GET-log-data-history")]
-        public async Task<ActionResult<DataSourceSummary>> GetHistory(
+        public async Task<ActionResult<DataSourceDetails>> GetHistory(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "log/data/{device}")] HttpRequest req,
             string device,
             ILogger log)

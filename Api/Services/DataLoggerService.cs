@@ -24,10 +24,10 @@ namespace TheSwamp.Api.Services
             _dataPointProcessors = dataPointProcessors;
         }
 
-        public async Task<DataSourceSummary> GetHistory(string device)
+        public async Task<DataSourceDetails> GetHistory(string device)
         {
             return await _trackingContext.DataSources
-                .Select(x => new DataSourceSummary()
+                .Select(x => new DataSourceDetails()
                 {
                     Id = x.Id,
                     Description = x.Description,
@@ -46,16 +46,24 @@ namespace TheSwamp.Api.Services
                             TimestampUtc = e.DataPoint.TimestampUtc,
                             Value = e.DataPoint.Value
                         }
-                    }).ToArray()
+                    }).ToArray(),
+                    Processors = x.Processors.Where(p => p.IsActive).Select(p=> new ProcessorSummary() { 
+                        Name = p.Name,
+                        Parameters = p.Parameters.Select(x => new Property() { 
+                            Name = x.Name,
+                            Value = x.Value
+                        }).ToArray()
+                    })
+                    .ToArray()
                 })
                 .SingleOrDefaultAsync(x => x.Name == device);
         }
 
 
-        public Task<DataSourceSummary[]> GetDataSourceSummaryAsync()
+        public Task<DataSourceDetails[]> GetDataSourceSummaryAsync()
         {
             var query = _trackingContext.DataSources
-                .Select(x => new DataSourceSummary()
+                .Select(x => new DataSourceDetails()
                 {
                     Id = x.Id,
                     Description = x.Description,

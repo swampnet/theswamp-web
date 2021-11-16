@@ -4,18 +4,15 @@ using System.Text.Json.Serialization;
 
 namespace TheSwamp.Shared
 {
-    public class DataSourceSummary
+    public class DataSourceDetails : DataSource
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Units { get; set; }
         public DateTime? LastUpdateOnUtc { get; set; }
         public string LastValue { get; set; }
         public int UpdateCount { get; set; }
 
         public DataPoint[] Values { get; set; }
         public DataSourceEventSummary[] Events { get; set; }
+        public ProcessorSummary[] Processors { get; set; }
     }
 
 
@@ -69,5 +66,12 @@ namespace TheSwamp.Shared
         [JsonProperty("d")]
         public string Description { get; set; }
         public DataPoint DataPoint { get; set; }
+    }
+
+
+    public class ProcessorSummary
+    {
+        public string Name { get; set; }
+        public Property[] Parameters { get; set; }
     }
 }

@@ -50,20 +50,20 @@ else
 @code {
 
     private HubConnection hubConnection;
-    private DataSourceSummary[] _values;
+    private DataSourceDetails[] _values;
     private DateTime _lastUpdate = DateTime.Now;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            _values = await Http.GetFromJsonAsync<DataSourceSummary[]>($"/api/log/data");
+            _values = await Http.GetFromJsonAsync<DataSourceDetails[]>($"/api/log/data");
             _lastUpdate = DateTime.Now;
             hubConnection = new HubConnectionBuilder()
                 .WithUrl($"{Http.BaseAddress}api/hub")
                 .Build();
 
-            hubConnection.On<DataSourceSummary[]>("monitor-values", (values) =>
+            hubConnection.On<DataSourceDetails[]>("monitor-values", (values) =>
             {
                 _values = values;
                 _lastUpdate = DateTime.Now;

@@ -20,21 +20,39 @@ else
     }
 
     <PlotlyChart @bind-Config="_config" @bind-Layout="_layout" @bind-Data="_data" @ref="_chart" />
+
+    if (_dataSource.Processors.Any())
+    {
+        <div class="processors">
+            <h4>Processors</h4>
+            @foreach(var p in _dataSource.Processors)
+            {
+                <strong>@p.Name</strong>
+                <ul>
+                @foreach(var pr in p.Parameters)
+                {
+                    <li>@pr.Name: @pr.Value</li>
+                }
+                </ul>
+            }
+        </div>
+
+@*        <div class="events">
+            <h4>Events</h4>
+            @foreach(var e in _dataSource.Events)
+            {
+                <div><strong>@e.TimestampUtc.ToLocalTime().ToString("HH\\:mm\\:ss dd MMM yy")</strong> @e.Description</div>
+            }
+        </div>
+*@    }
     
-    <div class="events">
-        <h4>Events</h4>
-        @foreach(var e in _dataSource.Events)
-        {
-            <div><strong>@e.TimestampUtc.ToLocalTime().ToString("HH\\:mm\\:ss dd MMM yy")</strong> @e.Description</div>
-        }
-    </div>
 }
 
 @code {
     [Parameter]
     public string Device { get; set; }
 
-    private DataSourceSummary _dataSource;
+    private DataSourceDetails _dataSource;
     private IList<ITrace> _data;
     private Layout _layout;
     private PlotlyChart _chart;
@@ -42,7 +60,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _dataSource = await Http.GetFromJsonAsync<DataSourceSummary>($"/api/log/data/" + Device);
+        _dataSource = await Http.GetFromJsonAsync<DataSourceDetails>($"/api/log/data/" + Device);
 
         _layout = new Layout()
         {
@@ -75,6 +93,7 @@ else
                 Y = _dataSource.Values.OrderBy(x => x.TimestampUtc).Select(x => (object)Convert.ToDouble(x.Value)).ToList()
             }
         };
+
 
         // Add in event data if we have any
         if (_dataSource.Events.Any())

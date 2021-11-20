@@ -195,10 +195,11 @@ app {
 }
 
 .dev{
-    font-size: small;
+    font-size: x-small;
     color:darkgreen;
     border: dashed 1px lightgray;
     padding:10px;
+    margin:5px;
 }
 
 .led-background {

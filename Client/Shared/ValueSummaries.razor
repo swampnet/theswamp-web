@@ -47,17 +47,27 @@ else
 
 <div style="font-size:x-small">update: @_lastUpdate.ToLocalTime().ToString("HH\\:mm\\:ss")</div>
 
+<div class="dev">
+    @foreach(var x in _log)
+    {
+        <div>[@x.Timestamp.ToString("HH\\:mm\\:ss")] @x.Message</div>
+    }
+</div>
+
 @code {
 
     private HubConnection hubConnection;
     private DataSourceDetails[] _values;
     private DateTime _lastUpdate = DateTime.Now;
+    private List<Loggy> _log = new List<Loggy>();
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            _log.Add(new Loggy("OnInitializedAsync"));
             _values = await Http.GetFromJsonAsync<DataSourceDetails[]>($"/api/log/data");
+            _log.Add(new Loggy("summary loaded"));
             _lastUpdate = DateTime.Now;
             hubConnection = new HubConnectionBuilder()
                 .WithUrl($"{Http.BaseAddress}api/hub")
@@ -67,9 +77,11 @@ else
             {
                 _values = values;
                 _lastUpdate = DateTime.Now;
-
                 StateHasChanged();
             });
+            hubConnection.Closed += OnClosed;
+            hubConnection.Reconnected += OnReconnected;
+            hubConnection.Reconnecting += OnReconnecting;
 
             await hubConnection.StartAsync();
 
@@ -87,6 +99,26 @@ else
         if (hubConnection != null)
         {
             await hubConnection.DisposeAsync();
+            _log.Add(new Loggy("disposed"));
         }
     }
+
+    private Task OnClosed(Exception ex)
+    {
+        _log.Add(new Loggy($"Hub - OnClosed: {ex?.Message}"));
+        return Task.CompletedTask;
+    }
+
+    private Task OnReconnected(string s)
+    {
+        _log.Add(new Loggy($"Hub - OnReconnected: {s}"));
+        return Task.CompletedTask;
+    }
+
+    private Task OnReconnecting(Exception ex)
+    {
+        _log.Add(new Loggy($"Hub - OnReconnecting: {ex?.Message}"));
+        return Task.CompletedTask;
+    }
+
 }

@@ -19,4 +19,15 @@ namespace TheSwamp.Client
             await builder.Build().RunAsync();
         }
     }
+
+    class Loggy
+    {
+        public Loggy(string message)
+        {
+            Timestamp = DateTime.UtcNow;
+            Message = message;
+        }
+        public DateTime Timestamp { get; set; }
+        public string Message { get; set; }
+    }
 }

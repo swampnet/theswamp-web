@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using Spectre.Console;
 using System;
 using System.Diagnostics;
-using System.Threading;
+using System.Linq;
 using System.Threading.Tasks;
 using TheSwamp.Shared;
 
@@ -15,6 +15,13 @@ namespace Integration
     {
         private static IConfiguration _cfg;
         
+        private static Pump[] _pumps = new[] { 
+            new Pump("Pump 1 (38) YELLOW", 38),
+            new Pump("Pump 2 (40) BLUE", 40),
+            new Pump("Pump 3 (36) RED", 36),
+            new Pump("Pump 4 (32) GREEN", 32)
+        };
+
         static async Task Main(string[] args)
         {
              _cfg = new ConfigurationBuilder()
@@ -27,16 +34,14 @@ namespace Integration
             while (true)
             {
                 var cmd = AnsiConsole.Prompt(
-                        new SelectionPrompt<string>()
-                            .Title("Select [green]option[/]?")
-                            .MoreChoicesText("[grey](Move up and down)[/]")
-                            .AddChoices(new[] { 
-                                "Get details",
-                                "Pump 1 (38)",
-                                "Pump 2 (40)",
-                                "Pump 3 (36)",
-                                "Pump 4 (32)"
-                            }));
+                    new SelectionPrompt<string>()
+                        .Title("Select [green]option[/] ?")
+                        .MoreChoicesText("[grey](Move up and down)[/]")
+                        .AddChoices(new[] { 
+                            "Get details"
+                        })
+                        .AddChoices(_pumps.Select(t => t.Description))
+                );
 
                 switch (cmd)
                 {
@@ -46,43 +51,20 @@ namespace Integration
                         AnsiConsole.WriteLine(x.ToString());
                         break;
 
-                    case "Pump 1 (38)":
-                        await EnqueueAsync(new AgentMessage() {
-                            Type = "activate-pump",
-                            Properties = new System.Collections.Generic.List<Property>() { 
-                                new Property("channel", "38")
-                            }
-                        });
-                        break;
-
-                    case "Pump 2 (40)":
-                        await EnqueueAsync(new AgentMessage()
+                    default:
+                        var t = _pumps.SingleOrDefault(x => x.Description == cmd);
+                        if(t != null)
                         {
-                            Type = "activate-pump",
-                            Properties = new System.Collections.Generic.List<Property>() {
-                                new Property("channel", "40")
-                            }
-                        });
-                        break;
+                            AnsiConsole.WriteLine($"Activating pump {t.Channel}");
 
-                    case "Pump 3 (36)":
-                        await EnqueueAsync(new AgentMessage()
-                        {
-                            Type = "activate-pump",
-                            Properties = new System.Collections.Generic.List<Property>() {
-                                new Property("channel", "36")
-                            }
-                        });
-                        break;
-
-                    case "Pump 4 (32)":
-                        await EnqueueAsync(new AgentMessage()
-                        {
-                            Type = "activate-pump",
-                            Properties = new System.Collections.Generic.List<Property>() {
-                                new Property("channel", "32")
-                            }
-                        });
+                            await EnqueueAsync(new AgentMessage()
+                            {
+                                Type = "activate-pump",
+                                Properties = new System.Collections.Generic.List<Property>() {
+                                    new Property("channel", t.Channel.ToString())
+                                }
+                            });
+                        }
                         break;
                 }
             }
@@ -97,6 +79,18 @@ namespace Integration
                 var message = new ServiceBusMessage(JsonConvert.SerializeObject(msg));
                 await sender.SendMessageAsync(message);
             }
+        }
+
+
+        class Pump
+        {
+            public Pump(string description, int channel)
+            {
+                Description = description;
+                Channel = channel;
+            }
+            public string Description { get; private set; }
+            public int Channel { get; private set; }
         }
     }
 }

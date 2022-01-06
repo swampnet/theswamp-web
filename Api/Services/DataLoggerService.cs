@@ -26,7 +26,9 @@ namespace TheSwamp.Api.Services
 
         public async Task<DataSourceDetails> GetHistory(string device)
         {
-            return await _trackingContext.DataSources
+            var MAX = 100;
+
+            var details = await _trackingContext.DataSources
                 .Select(x => new DataSourceDetails()
                 {
                     Id = x.Id,
@@ -36,20 +38,12 @@ namespace TheSwamp.Api.Services
                     LastUpdateOnUtc = x.Values.OrderByDescending(v => v.TimestampUtc).FirstOrDefault().TimestampUtc,
                     LastValue = x.Values.OrderByDescending(v => v.TimestampUtc).FirstOrDefault().Value,
                     UpdateCount = x.Values.Count(),
-                    Values = x.Values.ToArray(),
-                    Events = x.Events.Select(e => new DataSourceEventSummary() {
-                        DataSourceId = e.DataSourceId,
-                        Description = e.Description,
-                        TimestampUtc = e.TimestampUtc,
-                        DataPoint = new DataPoint() {
-                            DataSourceId = e.DataSourceId,
-                            TimestampUtc = e.DataPoint.TimestampUtc,
-                            Value = e.DataPoint.Value
-                        }
-                    }).ToArray(),
-                    Processors = x.Processors.Where(p => p.IsActive).Select(p=> new ProcessorSummary() { 
+                    Values = x.Values.OrderByDescending(x => x.TimestampUtc).Take(MAX).ToArray(),
+                    Processors = x.Processors.Where(p => p.IsActive).Select(p => new ProcessorSummary()
+                    {
                         Name = p.Name,
-                        Parameters = p.Parameters.Select(x => new Property() { 
+                        Parameters = p.Parameters.Select(x => new Property()
+                        {
                             Name = x.Name,
                             Value = x.Value
                         }).ToArray()
@@ -57,6 +51,27 @@ namespace TheSwamp.Api.Services
                     .ToArray()
                 })
                 .SingleOrDefaultAsync(x => x.Name == device);
+
+            var from = details.Values.Min(x => x.TimestampUtc);
+            var to = details.Values.Max(x => x.TimestampUtc);
+
+            if(details != null)
+            {
+                details.Events = await _trackingContext.Events.Where(e => e.DataSourceId == details.Id && e.TimestampUtc >= from && e.TimestampUtc <= to).Select(e => new DataSourceEventSummary()
+                {
+                    DataSourceId = e.DataSourceId,
+                    Description = e.Description,
+                    TimestampUtc = e.TimestampUtc,
+                    DataPoint = new DataPoint()
+                    {
+                        DataSourceId = e.DataSourceId,
+                        TimestampUtc = e.DataPoint.TimestampUtc,
+                        Value = e.DataPoint.Value
+                    }
+                }).ToArrayAsync();
+            }
+
+            return details;
         }
 
 

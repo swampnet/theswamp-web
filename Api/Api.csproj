@@ -1,24 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <AzureFunctionsVersion>v3</AzureFunctionsVersion>
-    <RootNamespace>TheSwamp.Api</RootNamespace>
+	  <TargetFramework>net6.0</TargetFramework>
+	  <AzureFunctionsVersion>v4</AzureFunctionsVersion>
+	  <RootNamespace>TheSwamp.Api</RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.3.0" />
-    <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
-    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.SignalRService" Version="1.6.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.19" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="3.1.19" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.19" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.19" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.19" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.13" />
-    <PackageReference Include="System.Text.Json" Version="5.0.2" />
-  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.7" />
+		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.SignalRService" Version="1.8.0" />
+		<PackageReference Include="Azure.Messaging.ServiceBus" Version="7.9.0" />
+		<PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
+      </ItemGroup>
+	
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
+	
   <ItemGroup>
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

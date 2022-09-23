@@ -131,18 +131,20 @@
         _message = "";
         _result = "Sending message: '" + x + "'";
 
-        await Http.PostAsJsonAsync($"/api/agent/messages", new AgentMessage()
-        {
-            Type = "led-matrix",
-            Properties = new List<Property>()
+        await Http.PostAsJsonAsync(
+            $"/api/agent/messages", 
+            new AgentMessage()
             {
-                new Property()
+                Type = "led-matrix",
+                Properties = new List<Property>()
                 {
-                    Name = "content",
-                    Value = x
+                    new Property()
+                    {
+                        Name = "content",
+                        Value = x
+                    }
                 }
-            }
-        }, null);
+            });
 
         _result = "Sent message '" + x + "'";
     }

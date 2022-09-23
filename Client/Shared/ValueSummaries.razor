@@ -98,7 +98,14 @@ else
     {
         if (hubConnection != null)
         {
+            hubConnection.Closed -= OnClosed;
+            hubConnection.Reconnected -= OnReconnected;
+            hubConnection.Reconnecting -= OnReconnecting;
+
             await hubConnection.DisposeAsync();
+
+            hubConnection = null;
+
             _log.Add(new Loggy("disposed"));
         }
     }

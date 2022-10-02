@@ -35,6 +35,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "media", "media", "{A16582D6
 		media\pi-01_bb.png = media\pi-01_bb.png
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{18DE8CEF-AB02-4394-A6F3-94FFE809BCB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportLWIN", "ImportLWIN\ImportLWIN.csproj", "{0DFAA960-C7C1-4D1A-AB65-A1D178DBFB84}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +65,10 @@ Global
 		{E0FA4E4C-3FFC-4A44-BE83-E5FFA4CD0A31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0FA4E4C-3FFC-4A44-BE83-E5FFA4CD0A31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0FA4E4C-3FFC-4A44-BE83-E5FFA4CD0A31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DFAA960-C7C1-4D1A-AB65-A1D178DBFB84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DFAA960-C7C1-4D1A-AB65-A1D178DBFB84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DFAA960-C7C1-4D1A-AB65-A1D178DBFB84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DFAA960-C7C1-4D1A-AB65-A1D178DBFB84}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -71,6 +79,7 @@ Global
 		{BEF6F3B3-C4F6-4B54-B917-D95606EFA5D4} = {2C65DA2B-794A-4EF7-938C-5629AC26B2E3}
 		{E0FA4E4C-3FFC-4A44-BE83-E5FFA4CD0A31} = {42BA5E1D-CCE2-4861-A41D-177597CD9C6A}
 		{A16582D6-6AC7-439A-AAF0-4924309CDC8F} = {EA3AF9BE-1E57-47A3-91C3-1089EA303E54}
+		{0DFAA960-C7C1-4D1A-AB65-A1D178DBFB84} = {18DE8CEF-AB02-4394-A6F3-94FFE809BCB8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F29999CD-3C9D-4894-8F10-4372E1347DF7}

@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OpenAI.GPT3.Extensions;
+using System;
 using TheSwamp.Api.DAL.API;
 using TheSwamp.Api.DAL.IOT;
 using TheSwamp.Api.DAL.LWIN;
@@ -35,6 +37,8 @@ namespace TheSwamp.Api
 
             builder.Services.AddTransient<IDataPointProcessor, RaiseEventOnValue>();
             builder.Services.AddTransient<IDataPointProcessor, SquirtyBoi>();
+
+            builder.Services.AddOpenAIService(settings => { settings.ApiKey = cfg["openai.api-key"]; });
 
             builder.Services.AddDbContext<TrackingContext>(options =>
                 options.UseSqlServer(cfg["connectionstring.swampnet"])

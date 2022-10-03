@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TheSwamp.Api.DAL.API;
 using TheSwamp.Api.DAL.IOT;
+using TheSwamp.Api.DAL.LWIN;
 using TheSwamp.Api.DAL.TRK;
 using TheSwamp.Api.Interfaces;
 using TheSwamp.Api.Services;
@@ -47,6 +48,9 @@ namespace TheSwamp.Api
                 options.UseSqlServer(cfg["connectionstring.swampnet"])
             );
 
+            builder.Services.AddDbContext<LWINContext>(options =>
+                options.UseSqlServer(cfg["connectionstring.swampnet"])
+            );
         }
     }
 }

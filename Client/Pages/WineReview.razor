@@ -1,0 +1,36 @@
+﻿@page "/wine"
+
+@using TheSwamp.Shared
+
+@inject HttpClient Http
+
+<h3>Wine Review</h3>
+
+@if (_review == null)
+{
+    <div class="busy" />
+}
+else
+{
+    <div>
+        <h4>@_review.Name</h4>
+    </div>
+}
+
+@code {
+    private Review _review;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _review = await Http.GetFromJsonAsync<Review>($"/api/wine/random-review");
+
+            this.StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+    }
+}

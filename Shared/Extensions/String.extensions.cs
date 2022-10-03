@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace TheSwamp.Shared
@@ -27,6 +28,11 @@ namespace TheSwamp.Shared
             }
 
             return lhs.Equals(rhs, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool ContainsNoCase(this IEnumerable<string> source, string value)
+        {
+            return source != null && source.Any(s => s.EqualsNoCase(value));
         }
     }
 }

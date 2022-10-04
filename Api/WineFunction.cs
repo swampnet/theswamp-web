@@ -135,7 +135,7 @@ namespace TheSwamp.Api
             }
             finally
             {
-                review.Benchmarks.Add(new Benchmark("Generate review", sw.Elapsed));
+                review.Benchmarks.Add(new Benchmark($"Generate review ({review.Model})", sw.Elapsed));
             }
         }
     }

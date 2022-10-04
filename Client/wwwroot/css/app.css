@@ -202,6 +202,10 @@ app {
     margin:5px;
 }
 
+.error{
+    color:red;
+}
+
 .led-background {
 /*    background-image: url("../img/20211011_091731_800.jpg");
     background-position:right top;

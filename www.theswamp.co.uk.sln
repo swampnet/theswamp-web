@@ -37,7 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "media", "media", "{A16582D6
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{18DE8CEF-AB02-4394-A6F3-94FFE809BCB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportLWIN", "ImportLWIN\ImportLWIN.csproj", "{0DFAA960-C7C1-4D1A-AB65-A1D178DBFB84}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImportLWIN", "ImportLWIN\ImportLWIN.csproj", "{0DFAA960-C7C1-4D1A-AB65-A1D178DBFB84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

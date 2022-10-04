@@ -8,14 +8,14 @@
 <div class="wine-review">
     @if (_review == null)
     {
-        <h3>Loading review...</h3>
+        <h3>Loading Review...</h3>
         <div class="busy" />
     }
     else
     {
         if (string.IsNullOrEmpty(_review.Error))
         {
-            var title = $"Id: {_review.Id}\nCountry:{_review.Country}\nRegion:{_review.Region}\nProducerName: {_review.ProducerName}\nColour: {_review.Colour}\nSubType: {_review.SubType}\nVintage: {_review.Vintage}";
+            var title = $"LWIN: {_review.Id}\nCountry:{_review.Country}\nRegion:{_review.Region}\nProducerName: {_review.ProducerName}\nColour: {_review.Colour}\nSubType: {_review.SubType}\nVintage: {_review.Vintage}";
 
             <div class="test">
                 <h3 title="@title">@_review.Name</h3>

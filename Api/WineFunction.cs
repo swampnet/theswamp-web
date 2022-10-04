@@ -12,14 +12,20 @@ using System.Threading.Tasks;
 using TheSwamp.Api.DAL.LWIN;
 using TheSwamp.Shared;
 using System.Linq;
+using TheSwamp.Api.DAL.LWIN.Entities;
+using System.Reflection.Metadata;
+using System.Diagnostics;
+using Newtonsoft.Json.Serialization;
 
 namespace TheSwamp.Api
 {
     public class WineFunction
     {
+        private readonly string _prompt = "Write a long and {{TONE}} review for a {{VINTAGE}} wine called {{DISPLAY_NAME}}. It's a {{SUB_TYPE}} {{COLOUR}} wine from {{REGION}} in {{COUNTRY}}. It's produced by {{PRODUCER_NAME}}.";
         private readonly IConfiguration _cfg;
         private readonly LWINContext _context;
         private readonly IOpenAIService _openAI;
+        private readonly Random _rng = new Random();
 
         public WineFunction(IConfiguration cfg, LWINContext context, IOpenAIService openAI)
         {
@@ -30,42 +36,107 @@ namespace TheSwamp.Api
 
 
         [FunctionName("random-review")]
-        public async Task<ActionResult<string>> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "wine/random-review")] HttpRequest req,
-            ILogger log)
+        public async Task<ActionResult<string>> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "wine/random-review")] HttpRequest req, ILogger log)
         {
-            log.LogInformation("random-review");
+            var review = new Review();
+            var swTotal = Stopwatch.StartNew();
 
-            var lwin = await _context.GetRandomWineAsync();
-
-            
-            var completionResult = await _openAI.Completions.CreateCompletion(new CompletionCreateRequest()
+            try
             {
-                Prompt = $"Write a long pretentious wine review for {lwin.DISPLAY_NAME}",
-                MaxTokens = 512
-            }, Models.TextCurieV1);
+                log.LogInformation("random-review");
+                
+                var sw = Stopwatch.StartNew();
+                var wine = await _context.GetRandomWineAsync();
+                review.Benchmarks.Add(new Benchmark("Get random wine from LWIN data", sw.Elapsed));
 
-            var review = new Review()
-            {
-                Id = lwin.LWIN,
-                Name = lwin.DISPLAY_NAME
-            };
+                review.Id = wine.LWIN;
+                review.Name = wine.DISPLAY_NAME;
+                review.Vintage = wine.FINAL_VINTAGE;
+                review.SubType = wine.SUB_TYPE;
+                review.Colour = wine.COLOUR;
+                review.ProducerName = wine.PRODUCER_NAME;
+                review.Country = wine.COUNTRY;
+                review.Region = wine.REGION;
+                review.Tone = RollTone();
 
-            if (completionResult.Successful)
-            {
-                review.Blurb = completionResult.Choices.FirstOrDefault().Text;
+                await ReviewAsync(review);
             }
-            else
+            catch (Exception ex)
             {
-                if (completionResult.Error == null)
-                {
-                    throw new Exception("Unknown Error");
-                }
-                Console.WriteLine($"{completionResult.Error.Code}: {completionResult.Error.Message}");
+                review.Error = ex.Message;
             }
-
+            finally
+            {
+                review.Benchmarks.Add(new Benchmark("Total elapsed",swTotal.Elapsed));
+            }
 
             return new OkObjectResult(review);
+        }
+
+        /// <summary>
+        /// pick a random tone.
+        /// </summary>
+        private string RollTone()
+        {
+            var v = _rng.Next(0, 100);
+            var tone = v switch
+            {
+                _ when v < 20 => "angry",
+                _ when v < 40 => "sarcastic",
+                _ => "pretentious"
+            };
+
+            return tone;
+        }
+
+        /// <summary>
+        /// Build a review
+        /// </summary>
+        /// <param name="review"></param>
+        private async Task ReviewAsync(Review review)
+        {
+            var sw = Stopwatch.StartNew();
+
+            try
+            {
+                review.Model = Models.TextCurieV1;
+
+                var p = _prompt
+                    .Replace("{{TONE}}", review.Tone)
+                    .Replace("{{VINTAGE}}", review.Vintage.EqualsNoCase("na") ? "" : $"{review.Vintage} vintage")
+                    .Replace("{{DISPLAY_NAME}}", review.Name)
+                    .Replace("{{SUB_TYPE}}", review.SubType)
+                    .Replace("{{COLOUR}}", review.Colour)
+                    .Replace("{{COUNTRY}}", review.Country)
+                    .Replace("{{REGION}}", review.Region)
+                    .Replace("{{PRODUCER_NAME}}", review.ProducerName);
+
+                var completionResult = await _openAI.Completions.CreateCompletion(new CompletionCreateRequest()
+                {
+                    Prompt = p,
+                    MaxTokens = 512
+                }, review.Model);
+
+                if (completionResult.Successful)
+                {
+                    review.Blurb = completionResult.Choices.FirstOrDefault().Text;
+                }
+                else
+                {
+                    if (completionResult.Error == null)
+                    {
+                        throw new Exception("Unknown Error");
+                    }
+                    else
+                    {
+                        throw new Exception($"{completionResult.Error.Code}: {completionResult.Error.Message}");
+                    }
+                }
+            }
+            finally
+            {
+                review.Benchmarks.Add(new Benchmark("Generate review", sw.Elapsed));
+            }
         }
     }
 }

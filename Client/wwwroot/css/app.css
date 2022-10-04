@@ -242,3 +242,26 @@ app {
 
     font-size: x-small;
 }
+
+.wine-review h3 {
+    text-align: center;
+    font-family: 'Tangerine', serif;
+    font-size: 48px;
+    text-shadow: 4px 4px 4px #aaa;
+}
+
+.wine-review h4 {
+    text-align: center;
+    font-size: small;
+}
+
+.wine-review .review {
+    margin-top: 2em;
+    font-style: italic;
+}
+
+.disclaimer {
+    margin-top: 1em;
+    font-size: x-small;
+    font-style: italic;
+}

@@ -16,12 +16,13 @@ using TheSwamp.Api.DAL.LWIN.Entities;
 using System.Reflection.Metadata;
 using System.Diagnostics;
 using Newtonsoft.Json.Serialization;
+using Microsoft.Extensions.Azure;
 
 namespace TheSwamp.Api
 {
     public class WineFunction
     {
-        private readonly string _prompt = "Write a long and {{TONE}} review for a {{VINTAGE}} wine called {{DISPLAY_NAME}}. It's a {{SUB_TYPE}} {{COLOUR}} wine from {{REGION}} in {{COUNTRY}}. It's produced by {{PRODUCER_NAME}}.";
+        private readonly string _prompt = "Write a long and {{TONE}} review for a {{VINTAGE}} fine wine called {{DISPLAY_NAME}}. It's a {{SUB_TYPE}} {{COLOUR}} wine from {{REGION}} in {{COUNTRY}}. It's produced by {{PRODUCER_NAME}}.";
         private readonly IConfiguration _cfg;
         private readonly LWINContext _context;
         private readonly IOpenAIService _openAI;
@@ -60,6 +61,7 @@ namespace TheSwamp.Api
                 review.Tone = RollTone();
 
                 await ReviewAsync(review);
+                await ModerateAsync(review);
             }
             catch (Exception ex)
             {
@@ -83,6 +85,8 @@ namespace TheSwamp.Api
             {
                 _ when v < 20 => "angry",
                 _ when v < 40 => "sarcastic",
+                _ when v < 60 => "rhyming",
+                _ when v < 80 => "funny",
                 _ => "pretentious"
             };
 
@@ -119,7 +123,7 @@ namespace TheSwamp.Api
 
                 if (completionResult.Successful)
                 {
-                    review.Blurb = completionResult.Choices.FirstOrDefault().Text;
+                    review.Blurb = completionResult.Choices.FirstOrDefault().Text;                    
                 }
                 else
                 {
@@ -137,6 +141,25 @@ namespace TheSwamp.Api
             {
                 review.Benchmarks.Add(new Benchmark($"Generate review ({review.Model})", sw.Elapsed));
             }
+        }
+
+
+        private async Task ModerateAsync(Review review)
+        {
+            var sw = Stopwatch.StartNew();
+
+            var mod = await _openAI.Moderation.CreateModeration(new CreateModerationRequest()
+            {
+                Input = review.Blurb
+            });
+
+            if (!mod.Successful || mod.Results.Any(r => r.Flagged))
+            {
+                review.Error = "Moderation failed";
+                review.Blurb = "[censored]";
+            }
+
+            review.Benchmarks.Add(new Benchmark("Moderation", sw.Elapsed));
         }
     }
 }

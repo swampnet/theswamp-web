@@ -23,7 +23,7 @@ namespace TheSwamp.Api
 {
     public class WineFunction
     {
-        private readonly string _prompt = "Write a long and {{TONE}} review for a {{VINTAGE}} fine wine called {{DISPLAY_NAME}}. It's a {{SUB_TYPE}} {{COLOUR}} wine from {{REGION}} in {{COUNTRY}}. It's produced by {{PRODUCER_NAME}}.";
+        private readonly string _prompt = "Write long and {{TONE}} tasting notes for a {{VINTAGE}} fine wine called {{DISPLAY_NAME}}. It's a {{SUB_TYPE}} {{COLOUR}} wine from {{REGION}} in {{COUNTRY}}. It's produced by {{PRODUCER_NAME}}.";
         private readonly ILogger _log;
         private readonly IConfiguration _cfg;
         private readonly LWINContext _context;

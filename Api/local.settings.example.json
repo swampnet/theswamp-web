@@ -8,7 +8,8 @@
     "AzureSignalRConnectionString": "<CONNECTION-STRING>",
     "connectionstring.swampnet": "<CONNECTION-STRING>",
     "azure.servicebus": "<CONNECTION-STRING>",
-    "openai.api-key": "<API-KEY>"
+    "openai.apikey": "<API-KEY>",
+    "openai.model": "text-davinci-003"
   },
   "Host": {
     "LocalHttpPort": 7071,

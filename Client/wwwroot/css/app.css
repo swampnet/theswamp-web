@@ -256,8 +256,12 @@ app {
 }
 
 .wine-review .review {
+    text-align: center;
+    font-size: 1.2em;
     margin-top: 2em;
     font-style: italic;
+    padding-left: 10%;
+    padding-right: 10%;
 }
 
 .disclaimer {

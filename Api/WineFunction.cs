@@ -123,7 +123,8 @@ namespace TheSwamp.Api
 
             try
             {
-                review.Model = Models.TextCurieV1;
+                //review.Model = Models.TextCurieV1;
+                review.Model = _cfg["openai.model"];
 
                 var p = _prompt
                     .Replace("{{TONE}}", review.Tone)

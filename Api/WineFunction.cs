@@ -81,8 +81,8 @@ namespace TheSwamp.Api
             var tone = v switch
             {
                 _ when v < 20 => "angry",
-                _ when v < 40 => "sarcastic",
-                //_ when v < 60 => "rhyming",
+                _ when v < 30 => "sarcastic",
+                _ when v < 40 => "rhyming",
                 //_ when v < 80 => "funny",
                 _ => "pretentious"
             };

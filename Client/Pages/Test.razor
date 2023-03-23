@@ -1,0 +1,77 @@
+﻿@page "/test"
+
+@using System.Threading;
+@using TheSwamp.Shared
+
+@inject HttpClient Http
+
+<div>
+    <span>Once upon a time</span>
+    <span>@streamResponse</span>
+</div>
+
+<div>
+    <button class="btn btn-outline-dark btn-sm" type="button" @onclick="Get">Generate</button>
+    <button class="btn btn-outline-dark btn-sm" type="button" @onclick="Stop">Cancel</button>
+    <p>Bytes read: @byteCount</p>
+    @if (_isBusy)
+    {
+        <div class="busy" />        
+    }
+</div>
+
+@code {
+    // Stream test
+    private bool _isBusy = false;
+    private int byteCount;
+    private string streamResponse;
+    private CancellationTokenSource cts;
+
+    async Task Get()
+    {
+        cts = new CancellationTokenSource();
+        streamResponse = "";
+        _isBusy = true;
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, "/api/story");
+
+        request.SetBrowserResponseStreamingEnabled(true); // Enable response streaming
+
+        // Be sure to use HttpCompletionOption.ResponseHeadersRead
+        using var response = await Http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+        using var stream = await response.Content.ReadAsStreamAsync();
+
+        // Read the response chunk by chunk and count the number of bytes
+        var bytes = new byte[10];
+        byteCount = 0;
+        while (!cts.Token.IsCancellationRequested)
+        {
+            Array.Clear(bytes, 0, bytes.Length);
+
+            var read = await stream.ReadAsync(bytes, cts.Token);
+            // End of stream
+            if (read == 0)
+            {
+                _isBusy = false;
+                return;
+            }
+
+            byteCount += read;
+
+            var s = System.Text.Encoding.Default.GetString(bytes.Where(x => x != 0).ToArray());
+            streamResponse += s;
+
+            // Update the UI
+            StateHasChanged();
+            await Task.Delay(1);
+        }
+    }
+
+
+    // Cancel the request
+    void Stop() 
+    { 
+        cts?.Cancel(); 
+        _isBusy = false;
+    }
+}

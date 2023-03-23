@@ -33,12 +33,14 @@ namespace TheSwamp.Api
 
             builder.Services.AddTransient<IDataLogger, DataLoggerService>();
             builder.Services.AddTransient<IAuth, Auth>();
+            builder.Services.AddTransient<IReviewWine, WineReviewerService>();
             builder.Services.AddTransient<IPostMessage, PostMessageService>();
 
             builder.Services.AddTransient<IDataPointProcessor, RaiseEventOnValue>();
             builder.Services.AddTransient<IDataPointProcessor, SquirtyBoi>();
 
             builder.Services.AddOpenAIService(settings => { settings.ApiKey = cfg["openai.apikey"]; });
+
 
             builder.Services.AddDbContext<TrackingContext>(options =>
                 options.UseSqlServer(cfg["connectionstring.swampnet"])

@@ -33,7 +33,7 @@ namespace TheSwamp.Api
 
             builder.Services.AddTransient<IDataLogger, DataLoggerService>();
             builder.Services.AddTransient<IAuth, Auth>();
-            builder.Services.AddTransient<IReviewWine, WineReviewerService>();
+            builder.Services.AddTransient<IReviewWine, CompletionWineReviewService>();
             builder.Services.AddTransient<IPostMessage, PostMessageService>();
 
             builder.Services.AddTransient<IDataPointProcessor, RaiseEventOnValue>();

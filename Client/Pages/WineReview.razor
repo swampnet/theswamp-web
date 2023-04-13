@@ -20,7 +20,7 @@
     }
 
     <p class="review">
-        @if(_streamResponse != null)
+        @if(!string.IsNullOrEmpty(_streamResponse))
         {
             <span class="oi oi-double-quote-serif-left" aria-hidden="true"></span>
         }

@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenAI.GPT3.Interfaces;
 using OpenAI.GPT3.ObjectModels.RequestModels;
@@ -12,13 +11,6 @@ using System.Threading.Tasks;
 using TheSwamp.Api.DAL.LWIN;
 using TheSwamp.Shared;
 using System.Linq;
-using TheSwamp.Api.DAL.LWIN.Entities;
-using System.Reflection.Metadata;
-using System.Diagnostics;
-using Newtonsoft.Json.Serialization;
-using Microsoft.Extensions.Azure;
-using Microsoft.Azure.SignalR.Protocol;
-using TheSwamp.Api.Interfaces;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,22 +21,20 @@ namespace TheSwamp.Api
         private readonly ILogger _log;
         private readonly IOpenAIService _ai;
         private readonly LWINContext _lwin;
-        private readonly IReviewWine _review;
 
         public WineFunction(
             ILogger<WineFunction> log,
             IOpenAIService openAI,
-            LWINContext lwin,
-            IReviewWine review)
+            LWINContext lwin)
         {
             _log = log;
             _ai = openAI;
             _lwin = lwin;
-            _review = review;
         }
 
         [FunctionName("wine-random")]
-        public async Task<ActionResult<Wine>> GetRandom([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "wine/random")] HttpRequest req)
+        public async Task<ActionResult<Wine>> GetRandom(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "wine/random")] HttpRequest req)
         {
             _log.LogDebug("load random wine");
             var w = await _lwin.GetRandomWineAsync();
@@ -65,7 +55,9 @@ namespace TheSwamp.Api
 
 
         [FunctionName("wine")]
-        public async Task<ActionResult<Wine>> Get([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "wine/{id:long}")] HttpRequest req, long id)
+        public async Task<ActionResult<Wine>> Get(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "wine/{id:long}")] HttpRequest req, 
+            long id)
         {
             _log.LogDebug($"load wine {id}");
             var w = await _lwin.Raw.SingleOrDefaultAsync(x => x.LWIN == id);
@@ -86,22 +78,12 @@ namespace TheSwamp.Api
 
 
 
-
-        [FunctionName("random-review")]
-        public async Task<ActionResult<string>> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "wine/random-review")] HttpRequest req)
-        {
-            _log.LogDebug("generate random wine review");
-
-            var review = await _review.ReviewAsync();
-
-            return new OkObjectResult(review);
-        }
-
-
         [FunctionName("review")]
         public async Task<ActionResult<string>> Review(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "wine/{id:long}/review")] HttpRequest req, long id)
         {
+            _log.LogDebug($"reviewing wine {id}");
+
             var response = req.HttpContext.Response;
 
             var w = await _lwin.Raw.SingleOrDefaultAsync(x => x.LWIN == id);

@@ -60,6 +60,7 @@ namespace TheSwamp.Api
                 MaxTokens = 1000
             }, Models.TextDavinciV3);
 
+
             await foreach (var completion in completionResult)
             {
                 if (completion.Successful)
@@ -79,6 +80,7 @@ namespace TheSwamp.Api
                     Console.WriteLine($"{completion.Error.Code}: {completion.Error.Message}");
                 }
             }
+
             Console.WriteLine("Complete");
             return new EmptyResult();
         }

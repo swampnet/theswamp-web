@@ -13,6 +13,8 @@ namespace TheSwamp.Shared
         Comedian,
         Rap,
         Drunk,
+        Emoji,
+        Apathetic,
         None
     }
 

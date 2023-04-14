@@ -71,7 +71,7 @@
     <div>Personality: @_personality</div>
     @if (_wine != null)
     {
-        <table width="100%">
+        <table width="100%" style="margin-top:10px">
             <thead>
                 <tr>
                     <th>Id</th>
@@ -182,7 +182,7 @@
             using var stream = await response.Content.ReadAsStreamAsync();
 
             // Read the response chunk by chunk and count the number of bytes
-            var bytes = new byte[100];
+            var bytes = new byte[10];
 
             while (!_cts.Token.IsCancellationRequested)
             {

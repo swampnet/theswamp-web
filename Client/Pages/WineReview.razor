@@ -19,7 +19,7 @@
         </div>
     }
 
-    <p class="review">
+    <div class="review">
         @if (!string.IsNullOrEmpty(_streamResponse))
         {
             <span class="oi oi-double-quote-serif-left" aria-hidden="true"></span>
@@ -33,7 +33,12 @@
             <span>&nbsp;</span>
             <span class="oi oi-double-quote-serif-right" aria-hidden="true"></span>
         }
-    </p>
+
+        @if(_isReviewing)
+        {
+            <div class="busy" />
+        }
+    </div>
 
     @if (!_isLoadingWine && !_isReviewing)
     {

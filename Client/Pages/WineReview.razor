@@ -175,6 +175,19 @@
         _isReviewing = true;
         try
         {
+            await _http.PostAsJsonAsync(
+                $"/api/agent/messages",
+                new AgentMessage() {
+                        Type = "led-matrix",
+                        Properties = new List<Property>() {
+                            new Property()
+                            {
+                                Name = "content",
+                                Value = $"Reviewing {_wine.Name}"
+                            }
+                        }
+                    });
+
             _streamResponse = "";
             _cts = new CancellationTokenSource();
             var url = $"/api/wine/{_wine.Id}/review?p={_personality}";

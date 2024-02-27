@@ -6,7 +6,7 @@
 @using System.Threading
 @using TheSwamp.Shared
 
-@inject HttpClient Http
+@inject HttpClient _http
 
 <div class="led-background">
     <h1>Post Message</h1>
@@ -38,90 +38,72 @@
     else
     {
         <h3>Recent messages</h3>
-
-        <div class="led_messages">
-            @foreach (var m in _values.OrderByDescending(x => x.TimestampUtc))
-            {
-                <div class="led-message" style="transform: rotate(@CalculateTilt(m)deg);background-color:@CalculateColor(m)">
-                    @m.Properties.StringValue("content")
-                    <div>
-                        <span>@m.TimestampUtc.ToLocalTime().ToString("dd MMM yyyy HH\\:mm")</span>
+        @if (_showList)
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Content</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var m in _values.OrderByDescending(x => x.TimestampUtc))
+                    {
+                        <tr>
+                            <td>@m.TimestampUtc.ToLocalTime().ToString("dd/MM/yyyy HH\\:mm")</td>
+                            <td>@m.Properties.StringValue("content")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="led_messages">
+                @foreach (var m in _values.OrderByDescending(x => x.TimestampUtc))
+                {
+                    <div class="led-message" style="transform: rotate(@CalculateTilt(m)deg);background-color:@CalculateColor(m)">
+                        @m.Properties.StringValue("content")
+                        <div>
+                            <span>@m.TimestampUtc.ToLocalTime().ToString("dd MMM yyyy HH\\:mm")</span>
+                        </div>
                     </div>
-                </div>
-            }
-        </div>
+                }
+            </div>
+        }
     }
+</div>
+
+<div class="selector">
+    <input id="ShowList" type="checkbox" @bind-value="@_showList" />
+    <label for="ShowList">Show List</label>
 </div>
 
 
 @code {
     private HubConnection _hubConnection;
 
+    private bool _showList = false;
     private List<AgentMessage> _values;// = new List<AgentMessage>();
     private string _message = "Hello!!";
     private string _result = "";
     private string _status;
     private string[] _messageColors = new[] {
-        "#F2E3CF",
-        "#C0D8F6",
-        "#D95B43",
-        "#7FB3D5",
-        "#B2BDCC",
-        "#F9AA33",
-        "#6699CC",
-        "#FFEBEE",
-        "#C9C9C9",
-        "#F2F5F7",
-        "#FBFBEF",
-        "#EBEBEB",
-        "#FCE8D6",
-        "#F2D1BF",
-        "#F0E6EF",
-        "#E0FFFF",
-        "#D7F4FF",
-        "#E5D1C0",
-        "#F8F8F8",
-        "#D7CFD8",
-        "#C5E0B4",
-        "#F5F5DC",
-        "#FDF5E6",
-        "#D2B48C",
-        "#F2F8F8",
-        "#EAF2D3",
-        "#E0EEE0",
-        "#D8D8D8",
-        "#FFF0F5",
-        "#FFF8DC",
-        "#FFF5EE",
-        "#F9E0E3",
-        "#F8F9FA",
-        "#FAFAFA",
-        // "#f6f6a6",
-        // "#f6f6b6",
-        // "#f6f6c6",
-        // "#f6f6d6",
-        // "#f6f6e6",
-        // "#f6f6f6",
-        // "#f6a6f6",
-        // "#f6b6f6",
-        // "#f6c6f6",
-        // "#fef6d6",
-        // "#fdf6e6",
-        // "#fcf6f6",
-        // "#fba6f6",
-        // "#fab6f6",
-        // "#f6ffc6",
-        // "#f6fed6",
-        // "#f6fde6",
-        // "#f6fcf6",
-        // "#f6abf6",
-        // "#f6baf6",
+        "#F2E3CF", "#C0D8F6", "#D95B43", "#7FB3D5", "#B2BDCC", "#F9AA33", "#6699CC", "#FFEBEE", "#C9C9C9", "#F2F5F7", "#FBFBEF", "#EBEBEB", "#FCE8D6", 
+        "#F2D1BF", "#F0E6EF", "#E0FFFF", "#D7F4FF", "#E5D1C0", "#F8F8F8", "#D7CFD8", "#C5E0B4", "#F5F5DC", "#FDF5E6", "#D2B48C", "#F2F8F8", "#EAF2D3", 
+        "#E0EEE0", "#D8D8D8", "#FFF0F5", "#FFF8DC", "#FFF5EE", "#F9E0E3", "#F8F9FA", "#FAFAFA"    
     };
+
+    private void ToggleView()
+    {
+        _showList = !_showList;
+    }
 
     protected override async Task OnInitializedAsync()
     {
         _hubConnection = new HubConnectionBuilder()
-            .WithUrl($"{Http.BaseAddress}api/hub")
+            .WithUrl($"{_http.BaseAddress}api/hub")
             .Build();
 
         _hubConnection.On<AgentMessage>("led-message", (message) =>
@@ -146,7 +128,7 @@
         try
         {
             _status = "Loading recent messages";
-            _values = await Http.GetFromJsonAsync<List<AgentMessage>>($"/api/agent/messages?type=led-matrix");
+            _values = await _http.GetFromJsonAsync<List<AgentMessage>>($"/api/agent/messages?type=led-matrix");
             _status = "";
 
             this.StateHasChanged();
@@ -165,7 +147,7 @@
         _message = "";
         _result = "Sending message: '" + x + "'";
 
-        await Http.PostAsJsonAsync(
+        await _http.PostAsJsonAsync(
             $"/api/agent/messages", 
             new AgentMessage()
             {

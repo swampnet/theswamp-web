@@ -1,21 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-	  <TargetFramework>net6.0</TargetFramework>
+	  <TargetFramework>net9.0</TargetFramework>
 	  <AzureFunctionsVersion>v4</AzureFunctionsVersion>
 	  <RootNamespace>TheSwamp.Api</RootNamespace>
   </PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Betalgo.OpenAI.GPT3" Version="6.8.1" />
-		<PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.0.1" />
+		<PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.5.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.7" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.7" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.7" />
-		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.SignalRService" Version="1.8.0" />
-		<PackageReference Include="Azure.Messaging.ServiceBus" Version="7.9.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="9.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.9" />
+		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.SignalRService" Version="1.13.0" />
+		<PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.4" />
 		<PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
       </ItemGroup>
 	

@@ -44,6 +44,7 @@ namespace Agent.QueueHandlers
 
             if(_gpio == null)
             {
+                // System.Device.Gpio 4.x removed PinNumberingScheme; default is now logical (BCM on Raspberry Pi)
                 _gpio = new GpioController();
             }
 

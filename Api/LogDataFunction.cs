@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Extensions.SignalRService;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -20,18 +18,19 @@ namespace TheSwamp.Api
     {
         private readonly IAuth _auth;
         private readonly IDataLogger _monitor;
+        private readonly ILogger<LogDataFunction> _log;
 
-        public LogDataFunction(IAuth auth, IDataLogger monitor)
+        public LogDataFunction(IAuth auth, IDataLogger monitor, ILogger<LogDataFunction> log)
         {
             _auth = auth;
             _monitor = monitor;
+            _log = log;
         }
 
 
-        [FunctionName("GET-log-data-device")]
+        [Function("GET-log-data-device")]
         public async Task<IActionResult> GetDevice(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "log/data/device")] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "log/data/device")] HttpRequest req)
         {
             if (!await _auth.AuthenticateAsync(req))
             {
@@ -40,7 +39,7 @@ namespace TheSwamp.Api
 
             var name = req.Query["name"];
 
-            log.LogInformation($"Get device: {name}");
+            _log.LogInformation($"Get device: {name}");
 
             var x = await _monitor.GetDeviceAsync(req.Query["name"]);
 
@@ -48,12 +47,11 @@ namespace TheSwamp.Api
         }
 
 
-        [FunctionName("GET-log-data")]
+        [Function("GET-log-data")]
         public async Task<IActionResult> Get(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "log/data")] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "log/data")] HttpRequest req)
         {
-            log.LogDebug("Get summary");
+            _log.LogDebug("Get summary");
 
             var x = await _monitor.GetDataSourceSummaryAsync();
 
@@ -61,13 +59,12 @@ namespace TheSwamp.Api
         }
 
 
-        [FunctionName("GET-log-data-history")]
+        [Function("GET-log-data-history")]
         public async Task<ActionResult<DataSourceDetails>> GetHistory(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "log/data/{device}")] HttpRequest req,
-            string device,
-            ILogger log)
+            string device)
         {
-            log.LogDebug($"Get history for {device}");
+            _log.LogDebug($"Get history for {device}");
 
             var x = await _monitor.GetHistory(device);
 
@@ -75,15 +72,13 @@ namespace TheSwamp.Api
         }
 
 
-        [FunctionName("POST-log-data")]
-        public async Task<IActionResult> PostValues(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "log/data")] HttpRequest req,
-            [SignalR(HubName = "theswamp")] IAsyncCollector<SignalRMessage> signalRMessages,
-            ILogger log)
+        [Function("POST-log-data")]
+        public async Task<PostLogDataOutput> PostValues(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "log/data")] HttpRequest req)
         {
             if (!await _auth.AuthenticateAsync(req))
             {
-                return new UnauthorizedResult();
+                return new PostLogDataOutput { HttpResponse = new UnauthorizedResult() };
             }
 
             using (var reader = new StreamReader(req.Body))
@@ -94,16 +89,24 @@ namespace TheSwamp.Api
             }
 
             var x = await _monitor.GetDataSourceSummaryAsync();
-            await signalRMessages.AddAsync(
-                new SignalRMessage
-                {
-                    Target = "monitor-values",
-                    Arguments = new[] { x }
-                });
 
-            return new OkResult();
+            return new PostLogDataOutput
+            {
+                Message = new SignalRMessageAction("monitor-values", new object[] { x }),
+                HttpResponse = new OkResult()
+            };
         }
 
     }
 
+    public class PostLogDataOutput
+    {
+        [SignalROutput(HubName = "theswamp")]
+        public SignalRMessageAction? Message { get; set; }
+
+        [HttpResult]
+        public IActionResult? HttpResponse { get; set; }
+    }
+
 }
+

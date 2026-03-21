@@ -44,7 +44,7 @@ namespace Agent.QueueHandlers
 
             if(_gpio == null)
             {
-                _gpio = new GpioController(PinNumberingScheme.Board);
+                _gpio = new GpioController();
             }
 
             DateTime lastActive;

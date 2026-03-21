@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenAI.GPT3.Managers;
@@ -22,31 +21,31 @@ namespace TheSwamp.Api
     {
         private readonly IConfiguration _cfg;
         private readonly IOpenAIService _openAI;
+        private readonly ILogger<PingFunction> _log;
 
-        public PingFunction(IConfiguration cfg, IOpenAIService openAI)
+        public PingFunction(IConfiguration cfg, IOpenAIService openAI, ILogger<PingFunction> log)
         {
             _cfg = cfg;
             _openAI = openAI;
+            _log = log;
         }
 
 
-        [FunctionName("ping")]
+        [Function("ping")]
         public async Task<ActionResult<string>> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req)
         {
             await Task.CompletedTask;
 
-            log.LogInformation("pong");
+            _log.LogInformation("pong");
 
             return new OkObjectResult($"pong @ {DateTime.Now}");
         }
 
 
-        [FunctionName("story")]
+        [Function("story")]
         public async Task<ActionResult<string>> OnceUponATime(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req)
         {
             var response = req.HttpContext.Response;
 

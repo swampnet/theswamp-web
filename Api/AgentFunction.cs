@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Extensions.SignalRService;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -31,32 +29,28 @@ namespace TheSwamp.Api
             _iotContext = iotContext;
         }
 
-        [FunctionName("POST-agent-messages")]
-        public async Task<IActionResult> PostMessage(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "agent/messages")] HttpRequest req,
-            [SignalR(HubName = "theswamp")] IAsyncCollector<SignalRMessage> signalRMessages
-            )
+        [Function("POST-agent-messages")]
+        public async Task<PostAgentMessageOutput> PostMessage(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "agent/messages")] HttpRequest req)
         {
+            AgentMessage msg;
             using (var reader = new StreamReader(req.Body))
             {
                 var json = await reader.ReadToEndAsync();
-                var msg = JsonConvert.DeserializeObject<AgentMessage>(json);
+                msg = JsonConvert.DeserializeObject<AgentMessage>(json);
                 msg.Properties.Add(new Property("client-ip", req.GetClientIp()));
                 await _postMessage.PostAsync(msg);
-
-                await signalRMessages.AddAsync(
-                    new SignalRMessage
-                    {
-                        Target = "led-message",
-                        Arguments = new[] { msg }
-                    });
             }
 
-            return new OkResult();
+            return new PostAgentMessageOutput
+            {
+                Message = new SignalRMessageAction("led-message", new object[] { msg }),
+                HttpResponse = new OkResult()
+            };
         }
 
 
-        [FunctionName("GET-agent-messages")]
+        [Function("GET-agent-messages")]
         public async Task<ActionResult<AgentMessage[]>> GetRecentMessages(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "agent/messages")] HttpRequest req)
         {
@@ -80,4 +74,14 @@ namespace TheSwamp.Api
                 .ToArrayAsync();
         }
     }
+
+    public class PostAgentMessageOutput
+    {
+        [SignalROutput(HubName = "theswamp")]
+        public SignalRMessageAction? Message { get; set; }
+
+        [HttpResult]
+        public IActionResult? HttpResponse { get; set; }
+    }
 }
+

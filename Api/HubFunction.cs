@@ -1,18 +1,18 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Extensions.SignalRService;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Functions.Worker;
 
 namespace TheSwamp.Api
 {
-    public class HubFunction : ServerlessHub
+    public class HubFunction
     {
-        [FunctionName("hub-negotiate")]
-        public SignalRConnectionInfo Negotiate(
+        [Function("hub-negotiate")]
+        public IActionResult Negotiate(
             [HttpTrigger(AuthorizationLevel.Anonymous, Route = "hub/negotiate")] HttpRequest req,
-            [SignalRConnectionInfo(HubName = "theswamp")] SignalRConnectionInfo connectionInfo)
+            [SignalRConnectionInfoInput(HubName = "theswamp")] SignalRConnectionInfo connectionInfo)
         {
-            return connectionInfo;
+            return new OkObjectResult(connectionInfo);
         }
     }
 }
+

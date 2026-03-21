@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using OpenAI.GPT3.Interfaces;
 using OpenAI.GPT3.ObjectModels.RequestModels;
@@ -36,7 +35,7 @@ namespace TheSwamp.Api
             _lwin = lwin;
         }
 
-        [FunctionName("wine-random")]
+        [Function("wine-random")]
         public async Task<ActionResult<Wine>> GetRandom(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "wine/random")] HttpRequest req)
         {
@@ -48,7 +47,7 @@ namespace TheSwamp.Api
         }
 
 
-        [FunctionName("wine")]
+        [Function("wine")]
         public async Task<ActionResult<Wine>> Get(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "wine/{id:long}")] HttpRequest req, 
             long id)
@@ -61,7 +60,7 @@ namespace TheSwamp.Api
         }
 
 
-        [FunctionName("review")]
+        [Function("review")]
         public async Task<ActionResult<string>> Review(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "wine/{id:long}/review")] HttpRequest req, long id)
         {
@@ -137,7 +136,6 @@ namespace TheSwamp.Api
                 seed.Add(new ChatMessage(StaticValues.ChatMessageRoles.User, prompt));
             }
 
-            // GPT3.5 is very reluctant to output anything negative, so any modifiers that ask it to be angry or negative about anything don't really work.
             switch (personality)
             {
                 case ReviewPersonality.Rhyme:
@@ -157,7 +155,7 @@ namespace TheSwamp.Api
                     break;
 
                 case ReviewPersonality.Rap:
-                    seed.Add(new ChatMessage(StaticValues.ChatMessageRoles.System, "I also want you to act as a rapper. You will come up with powerful and meaningful lyrics related to the wine or spirit you are reviewing, beats and rhythm that can ‘wow’ the audience. Your lyrics should have an intriguing meaning and message which people can relate too. When it comes to choosing your beat, make sure it is catchy yet relevant to your words, so that when combined they make an explosion of sound everytime!"));
+                    seed.Add(new ChatMessage(StaticValues.ChatMessageRoles.System, "I also want you to act as a rapper. You will come up with powerful and meaningful lyrics related to the wine or spirit you are reviewing, beats and rhythm that can 'wow' the audience. Your lyrics should have an intriguing meaning and message which people can relate too. When it comes to choosing your beat, make sure it is catchy yet relevant to your words, so that when combined they make an explosion of sound everytime!"));
                     break;
 
                 case ReviewPersonality.Drunk:
